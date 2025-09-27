@@ -3,6 +3,7 @@ using UnityEngine.Events;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using DG.Tweening;
 
 [AddComponentMenu("Timers/Countdown Timer (Threshold List)")]
 public class CountdownTimer : MonoBehaviour
@@ -17,6 +18,11 @@ public class CountdownTimer : MonoBehaviour
         [Tooltip("Saat RemainingTime <= nilai ini (detik), event dipanggil.")]
         [Min(0f)] public float thresholdSeconds = 60f;
 
+        public string textInformation;
+        public AudioClip audioClip;
+        [Range(0.7f, 5f)]
+        public float delayTimeToHide = 0.8f;
+
         [Tooltip("Event yang dipanggil saat melewati/masuk ke ambang ini.")]
         public UnityEvent onThreshold;
 
@@ -24,7 +30,7 @@ public class CountdownTimer : MonoBehaviour
     }
 
     // ====== Inspector ======
-    [Header("Setup")]
+    [Header("Configuration")]
     [Tooltip("Durasi awal timer (detik).")]
     [Min(0f)] public float startDurationSeconds = 120f;
 
@@ -39,8 +45,8 @@ public class CountdownTimer : MonoBehaviour
     [Tooltip("Tambah item untuk menambahkan ambang kustom. Event dipanggil saat waktu sisa <= ambang.")]
     public List<TimerThreshold> thresholdEvents = new List<TimerThreshold>()
     {
-        new TimerThreshold(){ name = "1 Minute Left", thresholdSeconds = 60f },
-        new TimerThreshold(){ name = "Last 15s", thresholdSeconds = 15f }
+        /* new TimerThreshold(){ name = "1 Minute Left", thresholdSeconds = 60f },
+        new TimerThreshold(){ name = "Last 15s", thresholdSeconds = 15f } */
     };
 
     [Tooltip("Urutkan threshold secara otomatis (kecil -> besar) saat play.")]
@@ -49,19 +55,20 @@ public class CountdownTimer : MonoBehaviour
     [Header("Other Events")]
     [Space(2f)]
     public UnityEvent onTickEachSecond;     // opsional, terpanggil tiap detik berganti
+    [Space(2f)]
     public UnityEvent onTimerCompleted;     // terpanggil saat timer habis
 
     [Header("Component References")]
     [Space(2f)]
-    [SerializeField] private TextMeshProUGUI text_timerText;
+    [SerializeField] private TextMeshProUGUI timer_timeText;
+    [SerializeField] private GameObject popup_objectparent;
+    [SerializeField] private TextMeshProUGUI popup_informationText;
 
-    // ====== Public readonly props ======
     public float RemainingTime => _remainingTime;
     public float Duration => _duration;
     public bool IsRunning => _isRunning;
     public bool IsPaused => _isPaused;
 
-    // ====== Private state ======
     float _duration;
     float _remainingTime;
     bool _isRunning;
@@ -69,7 +76,6 @@ public class CountdownTimer : MonoBehaviour
     Coroutine _loop;
     int _lastWholeSecond;
 
-    // ====== Unity lifecycle ======
     void Awake()
     {
         _duration = Mathf.Max(0f, startDurationSeconds);
@@ -181,7 +187,7 @@ public class CountdownTimer : MonoBehaviour
                 onTickEachSecond?.Invoke();
             }
 
-            UpdateTextUI(text_timerText);
+            UpdateTimeTextUI(timer_timeText);
 
             yield return null;
         }
@@ -192,7 +198,7 @@ public class CountdownTimer : MonoBehaviour
         StopLoop();
     }
 
-    private void UpdateTextUI(TextMeshProUGUI _text)
+    private void UpdateTimeTextUI(TextMeshProUGUI _text)
     {
         var t = Mathf.CeilToInt(RemainingTime);
         int m = Mathf.Max(0, t / 60);
@@ -200,7 +206,6 @@ public class CountdownTimer : MonoBehaviour
         _text.text = $"{m:00}:{s:00}";
     }
 
-    // ====== Helpers ======
     void TryFireThresholdEvents()
     {
         // Kita cek semua threshold yang belum fired dan sekarang sudah berada di bawah/tepat pada ambang
@@ -213,6 +218,22 @@ public class CountdownTimer : MonoBehaviour
             {
                 th._fired = true;
                 th.onThreshold?.Invoke();
+
+                // Tampilkan popup
+                popup_objectparent.SetActive(true);
+                popup_informationText.text = th.textInformation;
+
+                // Animasi scale menggunakan DOTween
+                popup_objectparent.transform.localScale = Vector3.zero; // Mulai dari scale 0
+                popup_objectparent.transform.DOScale(Vector3.one, 0.3f); // Animasi scale ke 1 dalam 0.3 detik
+
+                // Setelah 0.9 detik, animasikan scale kembali ke 0
+                DOTween.Sequence()
+                    .AppendInterval(th.delayTimeToHide)
+                    .Append(popup_objectparent.transform.DOScale(Vector3.zero, 0.2f).OnComplete(() =>
+                    {
+                        popup_objectparent.SetActive(false);
+                    })); // Animasi kembali ke scale 0 dalam 0.3 detik
             }
         }
     }
