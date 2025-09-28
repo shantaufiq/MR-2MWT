@@ -8,4 +8,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Sandboxing/Interface (sandboxing).unity
     guid: 99c9720ab356a0642a771bea13969a05
-  m_configObjects: {}
+  m_configObjects:
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 5f4a1095a74c67142859943f41932437,
+      type: 2}
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 43e89bc77062b5543ba0e2130f8ecba2,
+      type: 2}
