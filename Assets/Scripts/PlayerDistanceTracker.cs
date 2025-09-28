@@ -69,7 +69,11 @@ public class PlayerDistanceTracker : MonoBehaviour
 
     void TrackDistance()
     {
-        float distanceThisFrame = Vector3.Distance(playerTransform.position, lastPosition);
+        // Ambil posisi sekarang & posisi terakhir tapi abaikan Y
+        Vector3 currentPosXZ = new Vector3(playerTransform.position.x, 0f, playerTransform.position.z);
+        Vector3 lastPosXZ = new Vector3(lastPosition.x, 0f, lastPosition.z);
+
+        float distanceThisFrame = Vector3.Distance(currentPosXZ, lastPosXZ);
 
         // Saringan noise/teleport
         if (distanceThisFrame >= minStep && distanceThisFrame <= maxStep)
@@ -77,14 +81,13 @@ public class PlayerDistanceTracker : MonoBehaviour
             totalDistance += distanceThisFrame;
 
             // Atur alokasi jarak:
-            // - Jika di hijau (dan bukan merah), hitung sebagai benar.
-            // - Selain itu (keluar hijau atau di merah), hitung sebagai salah.
             if (isOnGreen && !isOnRed)
                 correctDistance += distanceThisFrame;
             else
                 wrongDistance += distanceThisFrame;
         }
 
+        // Update posisi terakhir (tetap pakai posisi asli, bukan yg diproyeksi ke XZ)
         lastPosition = playerTransform.position;
     }
 

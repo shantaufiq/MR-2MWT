@@ -49,10 +49,13 @@ public class OvalTrackGenerator : MonoBehaviour
 
     void Start()
     {
-        if (Application.isPlaying) Generate();        // hanya sekali saat runtime
+        if (Application.isPlaying)
+        {
+            Generate();        // hanya sekali saat runtime
+            SpawnCones();
+        }
     }
 
-    [ContextMenu("Generate (Play Mode)")]
     public void Generate()
     {
         if (player == null)
@@ -151,8 +154,6 @@ public class OvalTrackGenerator : MonoBehaviour
         // Apply ke LineRenderer
         lr.positionCount = pts.Count;
         lr.SetPositions(pts.ToArray());
-
-        SpawnCones();
     }
 
     // Opsional: set total panjang lintasan, otomatis hitung straightLength dari radius
