@@ -25,8 +25,8 @@ public class SamplePlayerController : MonoBehaviour
         controller = GetComponent<CharacterController>();
 
         // Lock cursor ke tengah layar
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        /* Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false; */
     }
 
     void Update()
