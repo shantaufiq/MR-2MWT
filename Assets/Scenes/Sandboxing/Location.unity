@@ -2603,7 +2603,7 @@ MonoBehaviour:
   straightLength: 5
   radius: 1
   clockwise: 1
-  toggleClockwise: {fileID: 1811976881}
+  toggleTrackRotation: {fileID: 1811976881}
   labelClockwiseText: {fileID: 1651319176}
   arcSegments: 32
   straightStep: 0.25

@@ -34,7 +34,7 @@ public class OvalTrackGenerator : MonoBehaviour
     public bool clockwise = true;
 
     [Space(2f)]
-    [SerializeField] private Toggle toggleClockwise;
+    [SerializeField] private Toggle toggleTrackRotation;
     [SerializeField] private TMP_Text labelClockwiseText;
 
     // ---------- SAMPLING ----------
@@ -67,8 +67,6 @@ public class OvalTrackGenerator : MonoBehaviour
     private TrackOrientation[] tOrientationValues;
     private int tOrientationIndex;
 
-    private bool _suppress;
-
     void Awake()
     {
         lr = GetComponent<LineRenderer>();
@@ -89,20 +87,15 @@ public class OvalTrackGenerator : MonoBehaviour
         if (prevBtn) prevBtn.onClick.AddListener(Prev);
         if (nextBtn) nextBtn.onClick.AddListener(Next);
 
-
-        /* Setup Tootle Clockwise */
-        toggleClockwise.onValueChanged.AddListener(OnToggleClockwiseChanged);
-
-        //_suppress = true;
-        toggleClockwise.isOn = clockwise;
-        // _suppress = false;
-        UpdateLabelToggleClockwise(clockwise);
+        toggleTrackRotation.onValueChanged.AddListener(ToggleClockwiseChanged);
+        toggleTrackRotation.isOn = true;
+        ToggleClockwiseChanged(true);
     }
 
     void Start()
     {
         if (matchClockwiseToOrientation)
-            clockwise = DefaultClockwiseFor(orientation);
+            clockwise = toggleTrackRotation.isOn == false ? !DefaultClockwiseFor(tOrientationValues[tOrientationIndex]) : DefaultClockwiseFor(tOrientationValues[tOrientationIndex]);
 
         if (Application.isPlaying)
         {
@@ -135,30 +128,20 @@ public class OvalTrackGenerator : MonoBehaviour
         if (labelOrientation) labelOrientation.text = tOrientationValues[tOrientationIndex].ToString();
     }
 
-    private void UpdateLabelToggleClockwise(bool isOn)
+    public void ToggleClockwiseChanged(bool isOn)
     {
+        clockwise = isOn == false ? !DefaultClockwiseFor(orientation) : DefaultClockwiseFor(orientation);
+        RegenerateAll();
+
         if (!labelClockwiseText) return;
         labelClockwiseText.text = isOn ? "Searah Jarum Jam" : "Berlawanan Jarum Jam";
-    }
-
-    public void OnToggleClockwiseChanged(bool isOn)
-    {
-        // if (_suppress) return;
-
-        Debug.Log("called...");
-
-        matchClockwiseToOrientation = false;
-        clockwise = !isOn;
-        UpdateLabelToggleClockwise(isOn);
-
-        RegenerateAll();
     }
 
     public void SetOrientation(TrackOrientation o)
     {
         orientation = o;
         if (matchClockwiseToOrientation)
-            clockwise = DefaultClockwiseFor(o);
+            clockwise = toggleTrackRotation.isOn == false ? !DefaultClockwiseFor(o) : DefaultClockwiseFor(o);
         RegenerateAll();
     }
 
