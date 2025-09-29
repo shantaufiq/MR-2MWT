@@ -2607,8 +2607,8 @@ MonoBehaviour:
   labelClockwiseText: {fileID: 1651319176}
   arcSegments: 32
   straightStep: 0.25
-  trackY: 0
-  conePrefab: {fileID: 4515982349255275548, guid: d671eeb30c483fe439dee9b84fc994f1,
+  trackY: -0.35
+  conePrefab: {fileID: 8924476173029791822, guid: 46f3e3363d6403743993672d0fcb6848,
     type: 3}
   coneOffsetFromTurn: 0
   coneY: 0.245
@@ -5256,6 +5256,79 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2038195414}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &2001552097523525665
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 8111488048074621684, guid: 46f3e3363d6403743993672d0fcb6848,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8111488048074621684, guid: 46f3e3363d6403743993672d0fcb6848,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8111488048074621684, guid: 46f3e3363d6403743993672d0fcb6848,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8111488048074621684, guid: 46f3e3363d6403743993672d0fcb6848,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8111488048074621684, guid: 46f3e3363d6403743993672d0fcb6848,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8111488048074621684, guid: 46f3e3363d6403743993672d0fcb6848,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8111488048074621684, guid: 46f3e3363d6403743993672d0fcb6848,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8111488048074621684, guid: 46f3e3363d6403743993672d0fcb6848,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8111488048074621684, guid: 46f3e3363d6403743993672d0fcb6848,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8111488048074621684, guid: 46f3e3363d6403743993672d0fcb6848,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8924476173029791822, guid: 46f3e3363d6403743993672d0fcb6848,
+        type: 3}
+      propertyPath: m_Name
+      value: 'Construction Cone '
+      objectReference: {fileID: 0}
+    - target: {fileID: 8924476173029791822, guid: 46f3e3363d6403743993672d0fcb6848,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 46f3e3363d6403743993672d0fcb6848, type: 3}
 --- !u!1001 &4954809193032506010
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5416,3 +5489,4 @@ SceneRoots:
   - {fileID: 1001225449}
   - {fileID: 93573510}
   - {fileID: 5991212}
+  - {fileID: 2001552097523525665}
