@@ -3,9 +3,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using Unity.VisualScripting;
 
 [RequireComponent(typeof(LineRenderer))]
-public class OvalTrackGenerator : MonoBehaviour
+public class TrackWaypointGenerator : MonoBehaviour
 {
     // ---------- ORIENTASI ----------
     public enum TrackOrientation { PlusX, MinusX, PlusZ, MinusZ }
@@ -73,6 +74,14 @@ public class OvalTrackGenerator : MonoBehaviour
     [Tooltip("Parent opsional untuk semua collider segmen.")]
     public Transform collidersParent;
 
+    // ---------- LAP COUNTER ----------
+    [Header("Lap Counter - Checkpoint Settings")]
+    public int checkpointCount = 4;   // misal 4 checkpoint (bawah, kanan, atas, kiri)
+    private List<GameObject> checkpointColliders = new List<GameObject>();
+    private int currentCheckpointIndex = 0;
+    public int lapsCompleted;
+    public bool lapCountingEnabled = false;
+
     private GameObject collidersRoot; // container runtime
 
     // ---------- INTERNAL ----------
@@ -86,25 +95,22 @@ public class OvalTrackGenerator : MonoBehaviour
     {
         lr = GetComponent<LineRenderer>();
         lr.useWorldSpace = true;
-        lr.loop = true;                          // oval tertutup
-        lr.alignment = LineAlignment.TransformZ; // supaya tidak menghadap kamera
+        lr.loop = true;
+        lr.alignment = LineAlignment.TransformZ;
 
-        /* Setup Track orientation Value */
-
-        // ambil semua nilai enum
         tOrientationValues = (TrackOrientation[])Enum.GetValues(typeof(TrackOrientation));
-
-        // sinkronkan index awal dengan nilai orientation pada target
         tOrientationIndex = Array.IndexOf(tOrientationValues, orientation);
         if (tOrientationIndex < 0) tOrientationIndex = 0;
 
-        // pasang listener tombol
         if (prevBtn) prevBtn.onClick.AddListener(Prev);
         if (nextBtn) nextBtn.onClick.AddListener(Next);
 
-        toggleTrackRotation.onValueChanged.AddListener(ToggleClockwiseChanged);
-        toggleTrackRotation.isOn = true;
-        ToggleClockwiseChanged(true);
+        if (toggleTrackRotation)
+        {
+            toggleTrackRotation.onValueChanged.AddListener(ToggleClockwiseChanged);
+            toggleTrackRotation.isOn = true;
+            ToggleClockwiseChanged(true);
+        }
     }
 
     void Start()
@@ -183,6 +189,9 @@ public class OvalTrackGenerator : MonoBehaviour
         Generate();
         SpawnCones();
         if (buildColliders) BuildTrackColliders(); else ClearTrackColliders();
+
+        currentCheckpointIndex = 0;
+        lapsCompleted = 0;
     }
     // =========================================================
 
@@ -358,6 +367,7 @@ public class OvalTrackGenerator : MonoBehaviour
         if (pts == null || pts.Count < 2) return;
 
         ClearTrackColliders();
+        checkpointColliders.Clear();
 
         // Root/parent
         collidersRoot = new GameObject("TrackColliders");
@@ -383,19 +393,13 @@ public class OvalTrackGenerator : MonoBehaviour
             dir /= segLen;
 
             float rendererY = pts.Count > 0 ? pts[0].y : trackY;
-
-            // Posisi tengah segmen
             Vector3 mid = 0.5f * (p0 + p1);
-
-            // Set center Y agar permukaan atas sejajar di trackY
-            float centerY = rendererY;
+            float centerY = rendererY + 0.2f;
 
             // GameObject segmen
             var go = new GameObject($"SegCol_{i:000}");
             go.layer = trackLayer;
             go.transform.SetParent(collidersRoot.transform, worldPositionStays: false);
-
-            // Rotasi supaya sumbu Z mengarah sepanjang segmen
             go.transform.position = new Vector3(mid.x, centerY, mid.z);
             go.transform.rotation = Quaternion.LookRotation(dir, Vector3.up);
 
@@ -404,6 +408,49 @@ public class OvalTrackGenerator : MonoBehaviour
             box.size = new Vector3(width, thick, segLen);
             box.center = Vector3.zero;
             box.isTrigger = true;
+
+            // Tandai beberapa segmen sebagai checkpoint
+            checkpointCount = Mathf.Clamp(checkpointCount, 2, Mathf.Max(2, count));
+            int step = Mathf.Max(1, count / checkpointCount);
+            if (i % step == 0)
+            {
+                var cp = go.AddComponent<TrackCheckpoint>();
+                cp.checkpointIndex = checkpointColliders.Count;
+                cp.generator = this;
+                checkpointColliders.Add(go);
+            }
         }
     }
+
+    public void OnCheckpointPassed(int index)
+    {
+        if (!lapCountingEnabled) return;  // <-- cegah hitung sebelum start
+
+        if (index == currentCheckpointIndex)
+        {
+            currentCheckpointIndex++;
+            if (currentCheckpointIndex >= checkpointCount)
+            {
+                lapsCompleted++;
+                currentCheckpointIndex = 0;
+            }
+        }
+        else
+        {
+            currentCheckpointIndex = 0;
+        }
+    }
+
+    public void ResetLapsAndCheckpoints()
+    {
+        currentCheckpointIndex = 0;
+        lapsCompleted = 0;
+    }
+
+    public void EnableLapCounting(bool enabled)
+    {
+        lapCountingEnabled = enabled;
+        if (!enabled) ResetLapsAndCheckpoints();
+    }
+
 }

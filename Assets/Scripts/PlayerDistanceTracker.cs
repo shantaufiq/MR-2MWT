@@ -34,11 +34,7 @@ public class PlayerDistanceTracker : MonoBehaviour
 
     void Start()
     {
-        if (playerTransform == null)
-            playerTransform = transform;
 
-        lastPosition = playerTransform.position;
-        UpdateGroundState();
     }
 
     void Update()
@@ -46,6 +42,15 @@ public class PlayerDistanceTracker : MonoBehaviour
         UpdateGroundState();
         TrackDistance();
         UpdateUI();
+    }
+
+    public void InitialPlayerPosition()
+    {
+        if (playerTransform == null)
+            playerTransform = transform;
+
+        lastPosition = playerTransform.position;
+        UpdateGroundState();
     }
 
     // --- Helper untuk cek lantai di bawah player ---
