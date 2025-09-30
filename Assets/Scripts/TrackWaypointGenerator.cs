@@ -60,6 +60,21 @@ public class OvalTrackGenerator : MonoBehaviour
     private GameObject coneLeftInstance;
     private GameObject coneRightInstance;
 
+    // ---------- COLLIDERS ----------
+    [Header("Track Colliders")]
+    [Tooltip("Bangun collider datar mengikuti lintasan agar bisa diraycast PlayerDistanceTracker.")]
+    public bool buildColliders = true;
+    [Tooltip("Lebar jalur yang bisa diinjak (meter).")]
+    public float trackWidth = 1.0f;
+    [Tooltip("Ketebalan fisik collider (meter).")]
+    public float colliderThickness = 0.05f;
+    [Tooltip("Layer untuk collider lintasan (set supaya termasuk di greenMask).")]
+    public int trackLayer = 0; // set ke layer 'TrackGreen' atau sejenisnya
+    [Tooltip("Parent opsional untuk semua collider segmen.")]
+    public Transform collidersParent;
+
+    private GameObject collidersRoot; // container runtime
+
     // ---------- INTERNAL ----------
     private LineRenderer lr;
     private readonly List<Vector3> pts = new List<Vector3>();
@@ -101,6 +116,7 @@ public class OvalTrackGenerator : MonoBehaviour
         {
             Generate();
             SpawnCones();
+            if (buildColliders) BuildTrackColliders();
         }
     }
 
@@ -166,6 +182,7 @@ public class OvalTrackGenerator : MonoBehaviour
     {
         Generate();
         SpawnCones();
+        if (buildColliders) BuildTrackColliders(); else ClearTrackColliders();
     }
     // =========================================================
 
@@ -323,5 +340,70 @@ public class OvalTrackGenerator : MonoBehaviour
         float minTotal = 2f * Mathf.PI * Mathf.Max(radius, 0.01f);
         totalLength = Mathf.Max(totalLength, minTotal + 1e-4f);
         straightLength = (totalLength - 2f * Mathf.PI * radius) * 0.5f;
+    }
+
+    // ===================  COLLIDER BUILDER  ===================
+    void ClearTrackColliders()
+    {
+        if (collidersRoot != null)
+        {
+            if (Application.isPlaying) Destroy(collidersRoot);
+            else DestroyImmediate(collidersRoot);
+            collidersRoot = null;
+        }
+    }
+
+    void BuildTrackColliders()
+    {
+        if (pts == null || pts.Count < 2) return;
+
+        ClearTrackColliders();
+
+        // Root/parent
+        collidersRoot = new GameObject("TrackColliders");
+        var parent = collidersParent != null ? collidersParent : transform;
+        collidersRoot.transform.SetParent(parent, worldPositionStays: true);
+
+        // Lebar & tebal aman
+        float width = Mathf.Max(0.05f, trackWidth);
+        float thick = Mathf.Max(0.01f, colliderThickness);
+
+        // Buat collider per segmen
+        int count = pts.Count;
+        for (int i = 0; i < count; i++)
+        {
+            Vector3 p0 = pts[i];
+            Vector3 p1 = pts[(i + 1) % count];
+
+            Vector3 dir = p1 - p0;
+            // Abaikan komponen Y; permukaan mendatar
+            dir.y = 0f;
+            float segLen = dir.magnitude;
+            if (segLen < 1e-3f) continue;
+            dir /= segLen;
+
+            float rendererY = pts.Count > 0 ? pts[0].y : trackY;
+
+            // Posisi tengah segmen
+            Vector3 mid = 0.5f * (p0 + p1);
+
+            // Set center Y agar permukaan atas sejajar di trackY
+            float centerY = rendererY;
+
+            // GameObject segmen
+            var go = new GameObject($"SegCol_{i:000}");
+            go.layer = trackLayer;
+            go.transform.SetParent(collidersRoot.transform, worldPositionStays: false);
+
+            // Rotasi supaya sumbu Z mengarah sepanjang segmen
+            go.transform.position = new Vector3(mid.x, centerY, mid.z);
+            go.transform.rotation = Quaternion.LookRotation(dir, Vector3.up);
+
+            // Pasang BoxCollider mendatar: (x=width, y=thickness, z=length)
+            var box = go.AddComponent<BoxCollider>();
+            box.size = new Vector3(width, thick, segLen);
+            box.center = Vector3.zero;
+            box.isTrigger = true;
+        }
     }
 }
