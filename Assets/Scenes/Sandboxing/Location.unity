@@ -2949,7 +2949,7 @@ MonoBehaviour:
   arcSegments: 32
   straightStep: 0.25
   trackY: -0.35
-  conePrefab: {fileID: 4515982349255275548, guid: d671eeb30c483fe439dee9b84fc994f1,
+  conePrefab: {fileID: 8047017009330130964, guid: bbf8261a11e93694694fb7825c71cb67,
     type: 3}
   coneOffsetFromTurn: 0
   coneY: 0.245
