@@ -5,9 +5,12 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Main Scene.unity
     guid: 798f9fe0e4e7cbe4da8540960eb1cec3
+  - enabled: 1
+    path: Assets/Samples/Meta XR Movement SDK/78.0.0/Body Tracking Samples/Scenes/MovementBody.unity
+    guid: d707936252ce4564e857133f9d24167d
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 67a7150285c85954ba3d12b61b6c5519,
       type: 2}
