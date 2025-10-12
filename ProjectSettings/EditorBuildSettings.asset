@@ -11,9 +11,6 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Samples/Meta XR Movement SDK/78.0.0/Body Tracking Samples/Scenes/MovementBody.unity
     guid: d707936252ce4564e857133f9d24167d
-  - enabled: 0
-    path: Assets/Scenes/Test.unity
-    guid: 29fc6cc4cf3916d4fa8f45a7d2452d97
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 67a7150285c85954ba3d12b61b6c5519,
       type: 2}
