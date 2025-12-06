@@ -21,7 +21,7 @@ namespace WalkingTest
         {
             if (ValidateAndFillData())
             {
-                _canvasManager.ShowPopup(0, true);
+                _canvasManager.ShowPopupConfirmation($"Simpan Data Diri", $"Apakah data diri Kamu sudah benar?", () => StoreUserDataToAppManager(), () => _canvasManager.ShowPanel(1));
             }
         }
 
