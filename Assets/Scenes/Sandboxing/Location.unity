@@ -1503,10 +1503,6 @@ MonoBehaviour:
   waypointGenerator: {fileID: 958658940}
   starterPanel: {fileID: 177258203}
   endPanel: {fileID: 990520771}
-  startButton: {fileID: 1320279874}
-  restartButton: {fileID: 392903020}
-  totalDistanceText: {fileID: 1126870639}
-  lapCountText: {fileID: 955149453}
   gameDurationSeconds: 120
 --- !u!1 &794535088
 GameObject:
@@ -2962,18 +2958,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1310842292}
   m_CullTransparentMesh: 1
---- !u!114 &1320279874 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6007685935604407012, guid: 29d0a6ec7663f524393f3d1e7ece4bb0,
-    type: 3}
-  m_PrefabInstance: {fileID: 6535073085408074548}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1449648851
 GameObject:
   m_ObjectHideFlags: 0
@@ -3875,6 +3859,11 @@ PrefabInstance:
       objectReference: {fileID: 673086319}
     - target: {fileID: 2386497795725639126, guid: 603a88590490ec44ebc05204351f1259,
         type: 3}
+      propertyPath: straightLength
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 2386497795725639126, guid: 603a88590490ec44ebc05204351f1259,
+        type: 3}
       propertyPath: labelOrientation
       value: 
       objectReference: {fileID: 453942532}
@@ -3942,6 +3931,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Arrow Line Renderer
+      objectReference: {fileID: 0}
+    - target: {fileID: 7788156188620227060, guid: 603a88590490ec44ebc05204351f1259,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -66,6 +66,8 @@ namespace WalkingTest
                 return false;
             }
 
+            _gender = selectedGender;
+
             return true;
         }
 

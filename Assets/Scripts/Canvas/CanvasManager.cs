@@ -52,6 +52,11 @@ namespace WalkingTest
                 panels[index].SetActive(true);
         }
 
+        public void OnClickShowPopup(int index)
+        {
+            ShowPopup(index, true);
+        }
+
         public void ShowPopup(int index, bool hideAllPanel = false)
         {
             if (index < 0 || index >= popups.Count)
