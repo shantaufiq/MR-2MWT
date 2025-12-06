@@ -13,19 +13,23 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject starterPanel; // Panel awal (tampilkan saat Start)
     [SerializeField] private GameObject endPanel;     // Panel akhir (tampilkan saat waktu habis)
 
-    [Header("UI Buttons")]
-    [SerializeField] private Button startButton;      // Tombol "Mulai" di panel starter
-    [SerializeField] private Button restartButton;    // (Opsional) tombol "Main Lagi" di panel akhir
+    // [SerializeField] private Button startButton;      
+    // [SerializeField] private Button restartButton;   
 
     [Header("UI Result Texts")]
-    [SerializeField] private TextMeshProUGUI totalDistanceText; // Teks hasil total jarak
-    [SerializeField] private TextMeshProUGUI lapCountText;      // Teks hasil jumlah putaran
+    private TextMeshProUGUI totalDistanceText;
+    private TextMeshProUGUI lapCountText;
 
     [Header("Options")]
     [Tooltip("Set durasi tes (detik) saat mulai game.")]
     [SerializeField] private float gameDurationSeconds = 120f;
 
     void Awake()
+    {
+
+    }
+
+    private void InitialFlow()
     {
         // State awal UI
         if (starterPanel) starterPanel.SetActive(true);
@@ -47,11 +51,9 @@ public class GameManager : MonoBehaviour
         }
 
         // Hook tombol
-        if (startButton) startButton.onClick.AddListener(StartGame);
-        if (restartButton) restartButton.onClick.AddListener(RestartGame);
+        // if (startButton) startButton.onClick.AddListener(StartGame);
+        // if (restartButton) restartButton.onClick.AddListener(RestartGame);
     }
-
-    // --- FLOW ---
 
     public void StartGame()
     {
