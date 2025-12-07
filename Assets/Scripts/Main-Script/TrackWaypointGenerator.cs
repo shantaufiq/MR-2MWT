@@ -136,6 +136,13 @@ namespace WalkingTest
             }
         }
 
+        public void HideTrackway()
+        {
+            coneLeftInstance.SetActive(false);
+            coneRightInstance.SetActive(false);
+            lr.enabled = false;
+        }
+
         // =========================================================
         // ===================  ORIENTATION API  ===================
         // Panggil fungsi2 ini dari Button.onClick

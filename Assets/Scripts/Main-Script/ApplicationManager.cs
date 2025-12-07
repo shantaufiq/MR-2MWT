@@ -26,6 +26,7 @@ namespace WalkingTest
         public float wrongDistance;
         public float walkingSpeed;
         public int totalLaps;
+        private int stepsCount = 0;
     }
 
     public class ApplicationManager : MonoBehaviour
