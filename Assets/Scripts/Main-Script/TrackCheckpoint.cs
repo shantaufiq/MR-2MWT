@@ -13,7 +13,7 @@ namespace WalkingTest
             {
                 generator.OnCheckpointPassed(checkpointIndex);
 
-                Debug.Log($"player passed checkpoint number {checkpointIndex}");
+                // Debug.Log($"player passed checkpoint number {checkpointIndex}");
             }
         }
     }

@@ -1896,6 +1896,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ebc0513891240c4a85246063641687d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _2MWTData:
+    totalDistance: 0
+    correctWay: 0
+    wrongWay: 0
+    walkingSpeed: 0
+    totalLaps: 0
+    stepsCount: 0
+  _6MWTData:
+    totalDistance: 0
+    correctWay: 0
+    wrongWay: 0
+    walkingSpeed: 0
+    totalLaps: 0
+    stepsCount: 0
   _testDuration: 360
   _countdownAudio: {fileID: 11400000, guid: e01d32e11fb65814e8fb59c9cc008e7c, type: 2}
   _trialInstruction:
@@ -2025,18 +2039,30 @@ MonoBehaviour:
     type: 2
     textInformation: Waktu tersisa 4 menit
     audioClip: {fileID: 11400000, guid: 0f1091cc30527004c9f421d97ac61488, type: 2}
-    icon: {fileID: 21300000, guid: 3b9c4e84dac30a34cb80ef285dd3149c, type: 3}
+    icon: {fileID: 21300000, guid: 707a04d8197dc1a479ba115531236534, type: 3}
     thresholdSeconds: 240
     delayTimeToHide: 5
     onThreshold:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 249162269}
+          m_TargetAssemblyTypeName: WalkingTest.WalkTestManager, Assembly-CSharp
+          m_MethodName: GetData2MWT
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
     _fired: 0
   - name: 3 Menit
     type: 2
-    textInformation: Waktu tersisa 4 menit
-    audioClip: {fileID: 0}
-    icon: {fileID: 21300000, guid: 3b9c4e84dac30a34cb80ef285dd3149c, type: 3}
+    textInformation: Waktu tersisa 3 menit
+    audioClip: {fileID: 11400000, guid: d866793a36eef4748953518d2a667061, type: 2}
+    icon: {fileID: 21300000, guid: 1ce21993c341d054c9f4709ae53d5a51, type: 3}
     thresholdSeconds: 180
     delayTimeToHide: 5
     onThreshold:
@@ -2046,8 +2072,8 @@ MonoBehaviour:
   - name: 2 Menit
     type: 2
     textInformation: Waktu tersisa 2 menit
-    audioClip: {fileID: 0}
-    icon: {fileID: 21300000, guid: 3b9c4e84dac30a34cb80ef285dd3149c, type: 3}
+    audioClip: {fileID: 11400000, guid: 188e8eb58bb79384b87ea781bab91b03, type: 2}
+    icon: {fileID: 21300000, guid: d3983cb07b45a4448b02ea5e63a61dd0, type: 3}
     thresholdSeconds: 120
     delayTimeToHide: 5
     onThreshold:
@@ -2058,7 +2084,7 @@ MonoBehaviour:
     type: 2
     textInformation: 1 menit terakhir
     audioClip: {fileID: 11400000, guid: c2b8bd3a4979b5b4b98015f1dbd7dd6c, type: 2}
-    icon: {fileID: 21300000, guid: 3b9c4e84dac30a34cb80ef285dd3149c, type: 3}
+    icon: {fileID: 21300000, guid: 22b0e10219c02e240bbe949b6d8228b2, type: 3}
     thresholdSeconds: 60
     delayTimeToHide: 5
     onThreshold:
@@ -2067,9 +2093,9 @@ MonoBehaviour:
     _fired: 0
   - name: 20 detik
     type: 2
-    textInformation: 20 detik
+    textInformation: 20 detik terakhir
     audioClip: {fileID: 11400000, guid: ac3aa748d1bc71443b97c8bbb8585846, type: 2}
-    icon: {fileID: 21300000, guid: 3b9c4e84dac30a34cb80ef285dd3149c, type: 3}
+    icon: {fileID: 21300000, guid: 6c63be20f1eaba646824fc25163719de, type: 3}
     thresholdSeconds: 20
     delayTimeToHide: 5
     onThreshold:
@@ -2146,6 +2172,7 @@ MonoBehaviour:
   _canvasManager: {fileID: 904790634}
   _wayPointGenerator: {fileID: 958658940}
   _smartwatch: {fileID: 1617001840}
+  _distanceTracker: {fileID: 400412054}
 --- !u!1 &265548730
 GameObject:
   m_ObjectHideFlags: 0
@@ -3278,7 +3305,7 @@ GameObject:
   - component: {fileID: 400412047}
   - component: {fileID: 400412052}
   - component: {fileID: 400412051}
-  - component: {fileID: 400412053}
+  - component: {fileID: 400412054}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -3420,7 +3447,7 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &400412053
+--- !u!114 &400412054
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3429,21 +3456,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 400412046}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12e8fca3562d48b40af6f17661357316, type: 3}
+  m_Script: {fileID: 11500000, guid: aabc09974032bcf48ae4eaf0ed981d67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerTransform: {fileID: 400412050}
-  greenMask:
+  _totalDistance: 0
+  _correctDistance: 0
+  _wrongDistance: 0
+  _greenMask:
     serializedVersion: 2
     m_Bits: 1024
-  redMask:
+  _redMask:
     serializedVersion: 2
     m_Bits: 2048
-  distanceText: {fileID: 0}
-  minStep: 0.001
-  maxStep: 2
-  correctDistance: 0
-  wrongDistance: 0
+  _minStep: 0.001
+  _maxStep: 2
+  _controller: {fileID: 400412052}
+  _playerTransform: {fileID: 400412050}
 --- !u!1 &420832152
 GameObject:
   m_ObjectHideFlags: 0

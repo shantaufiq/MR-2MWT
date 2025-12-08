@@ -9,6 +9,10 @@ namespace WalkingTest
 {
     public class WalkTestManager : MonoBehaviour
     {
+        [Header("Walking Test Result Data")]
+        [SerializeField] private TestResultData _2MWTData = new();
+        [SerializeField] private TestResultData _6MWTData = new();
+
         [Header("Component | Countdown & Timer")]
         [SerializeField] private float _testDuration = 360f;
         [SerializeField] private SFXObject _countdownAudio;
@@ -61,6 +65,7 @@ namespace WalkingTest
         [SerializeField] private CanvasManager _canvasManager;
         [SerializeField] private TrackWaypointGenerator _wayPointGenerator;
         [SerializeField] private Smartwatch _smartwatch;
+        [SerializeField] private DistanceTracker _distanceTracker; // akan diganti denga vr distance tracker
 
         public void StartTrialTest()
         {
@@ -80,6 +85,9 @@ namespace WalkingTest
 
                 _countdownRoutine = StartCoroutine(CountdownRoutine(() =>
                 {
+                    _distanceTracker.StartTracking();
+
+                    _wayPointGenerator.onReachingLap.RemoveAllListeners();
                     _wayPointGenerator.onReachingLap.AddListener((int n) =>
                     {
                         if (n == 1)
@@ -130,9 +138,12 @@ namespace WalkingTest
 
                 _countdownRoutine = StartCoroutine(CountdownRoutine(() =>
                 {
+                    _distanceTracker.StartTracking();
                     _canvasManager.SetActiveCountDown(false, $"", "J");
                     StartTimer(() =>
                     {
+                        _distanceTracker.StopTracking();
+                        _distanceTracker.GetResult((x) => _6MWTData.totalDistance = x, (x) => _6MWTData.correctWay = x, (x) => _6MWTData.wrongWay = x);
                         SFXManager.Main.PlayFromSFXObjectLibrary("8testsuccess");
                         _canvasManager.SetActiveCountDown(false, $"", "");
                         _wayPointGenerator.HideTrackway();
@@ -149,23 +160,12 @@ namespace WalkingTest
 
         private void StoreTestResult()
         {
-            TestResultData _2mwt = new();
-            _2mwt.totalDistance = 12;
-            _2mwt.correctWay = 10;
-            _2mwt.wrongWay = 2;
-            _2mwt.walkingSpeed = 5;
-            _2mwt.totalLaps = 3;
-            _2mwt.stepsCount = 50;
+            _applicationManager.StoreTestResultData(_2MWTData, _6MWTData);
+        }
 
-            TestResultData _6mwt = new();
-            _6mwt.totalDistance = 24;
-            _6mwt.correctWay = 20;
-            _6mwt.wrongWay = 4;
-            _6mwt.walkingSpeed = 3;
-            _6mwt.totalLaps = 6;
-            _6mwt.stepsCount = 100;
-
-            _applicationManager.StoreTestResultData(_2mwt, _6mwt);
+        public void GetData2MWT()
+        {
+            _distanceTracker.GetResult((x) => _2MWTData.totalDistance = x, (x) => _2MWTData.correctWay = x, (x) => _2MWTData.wrongWay = x);
         }
 
         #region Timer & Countdown

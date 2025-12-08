@@ -153,7 +153,7 @@ namespace WalkingTest
             _textUsername.text = _userData.username;
             _textAge.text = _userData.age.ToString();
             _textGender.text = _userData.gender == UserData.Gender.Male ? $"Laki-laki" : $"Perempuan";
-            _textTotalJarak.text = $"{_2mwtData.totalDistance.ToString()} m";
+            _textTotalJarak.text = $"{_2mwtData.totalDistance:F2} m";
             _textLaps.text = $"{_2mwtData.totalLaps.ToString()} kali";
             _textPace.text = $"{_2mwtData.walkingSpeed:F1} m/menit";
             _textTitleSummary.text = $"2 Minutes Walking Test";
@@ -167,7 +167,7 @@ namespace WalkingTest
             _textUsername.text = _userData.username;
             _textAge.text = _userData.age.ToString();
             _textGender.text = _userData.gender == UserData.Gender.Male ? $"Laki-laki" : $"Perempuan";
-            _textTotalJarak.text = $"{_6mwtData.totalDistance.ToString()} m";
+            _textTotalJarak.text = $"{_6mwtData.totalDistance:F2} m";
             _textLaps.text = $"{_6mwtData.totalLaps.ToString()} kali";
             _textPace.text = $"{_6mwtData.walkingSpeed:F1} m/menit";
             _textTitleSummary.text = $"6 Minutes Walking Test";

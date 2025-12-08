@@ -41,7 +41,6 @@ public class SamplePlayerController : MonoBehaviour
         float z = Input.GetAxis("Vertical");   // W, S
 
         Vector3 move = transform.right * x + transform.forward * z;
-        controller.Move(move * moveSpeed * Time.deltaTime);
 
         // Gravity
         if (controller.isGrounded && velocity.y < 0)
@@ -55,7 +54,9 @@ public class SamplePlayerController : MonoBehaviour
         }
 
         velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
+
+        Vector3 finalMove = move + velocity;
+        controller.Move(finalMove * Time.deltaTime);
     }
 
     void HandleMouseLook()

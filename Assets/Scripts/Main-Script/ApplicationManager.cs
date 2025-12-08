@@ -97,7 +97,11 @@ namespace WalkingTest
                     break;
                 case AppState.Result:
                     SFXManager.Main.PlayFromSFXObjectLibrary("9hasiltest");
-                    _canvasManager.ShowResultPanel(_userData, _test2MWTData, _test6MWTData, () => NextStage());
+                    _canvasManager.ShowResultPanel(_userData, _test2MWTData, _test6MWTData, () =>
+                    {
+                        SFXManager.Main.StopAll();
+                        NextStage();
+                    });
                     break;
             }
         }
