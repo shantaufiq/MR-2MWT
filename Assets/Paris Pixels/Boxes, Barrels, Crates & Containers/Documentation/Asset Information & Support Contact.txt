@@ -1,0 +1,6 @@
+Prefabs come ready to use in unity, otherwise 
+meshes require material to be re-assigned and saved 
+as new Prefab. Enjoy your Assets! 
+
+Email ParisPixels@outlook.com for any additional 
+information or if any problems arise.  

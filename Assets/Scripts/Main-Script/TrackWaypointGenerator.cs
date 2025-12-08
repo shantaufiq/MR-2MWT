@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using WalkingTest;
+using UnityEngine.Events;
 
 namespace WalkingTest
 {
@@ -84,6 +85,8 @@ namespace WalkingTest
         private int currentCheckpointIndex = 0;
         public int lapsCompleted;
         public bool lapCountingEnabled = false;
+
+        public UnityEvent<int> onReachingLap;
 
         private GameObject collidersRoot; // container runtime
 
@@ -449,6 +452,7 @@ namespace WalkingTest
                 if (currentCheckpointIndex >= checkpointCount)
                 {
                     lapsCompleted++;
+                    onReachingLap?.Invoke(lapsCompleted);
                     currentCheckpointIndex = 0;
                 }
             }

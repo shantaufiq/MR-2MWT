@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace WalkingTest
 {
@@ -19,14 +20,14 @@ namespace WalkingTest
     }
 
     [Serializable]
-    public class TestData
+    public class TestResultData
     {
         public float totalDistance;
-        public float correctDistance;
-        public float wrongDistance;
+        public float correctWay;
+        public float wrongWay;
         public float walkingSpeed;
         public int totalLaps;
-        private int stepsCount = 0;
+        public int stepsCount = 0;
     }
 
     public class ApplicationManager : MonoBehaviour
@@ -40,8 +41,8 @@ namespace WalkingTest
         [Header("APP DATA")]
         [SerializeField] private AppState _currentAppState = AppState.Startup;
         [SerializeField] private UserData _userData = new();
-        [SerializeField] private TestData _test2MWTData = new();
-        [SerializeField] private TestData _test6MWTData = new();
+        [SerializeField] private TestResultData _test2MWTData = new();
+        [SerializeField] private TestResultData _test6MWTData = new();
 
         [Header("Component References")]
         [SerializeField] private CanvasManager _canvasManager;
@@ -50,6 +51,10 @@ namespace WalkingTest
 
         private void Start()
         {
+            MusicManager.Main.SetVolume(.2f, 0f);
+            SFXManager.Main.SetVolume(.8f, 0f);
+            MusicManager.Main.PlayFromLibrary("backsound");
+
             UpdateAppStage(AppState.Startup);
         }
 
@@ -60,20 +65,29 @@ namespace WalkingTest
             switch (_currentAppState)
             {
                 case AppState.Startup:
-                    _canvasManager.ShowPanel(0);
+                    _canvasManager.ShowPanel(0, () =>
+                    {
+                        NextStage();
+                    });
                     break;
                 case AppState.Registration:
+                    SFXManager.Main.PlayFromSFXObjectLibrary("1datadiri");
                     _canvasManager.ShowPanel(1);
                     // show validation mechanic in registration script
                     break;
                 case AppState.Instruction:
-                    _canvasManager.ShowPanel(2, () => _canvasManager.ShowPanel(3, () => NextStage()));
+                    SFXManager.Main.StopAll();
+                    SFXManager.Main.PlayFromSFXObjectLibrary("2tentang");
+                    _canvasManager.ShowPanel(2, () => _canvasManager.ShowPanel(3, () =>
+                    {
+                        SFXManager.Main.StopAll();
+                        NextStage();
+                    }));
                     // show validation mechanic in registration script
                     break;
                 case AppState.Settings:
-                    _canvasManager.ShowPanel(4);
+                    _canvasManager.ShowPanel(4, () => NextStage());
                     _wayPointGenerator.gameObject.SetActive(true); // show walking area
-                    // mechanic walking area settings 
                     break;
                 case AppState.Trial:
                     _walkTestManager.StartTrialTest();
@@ -82,7 +96,8 @@ namespace WalkingTest
                     _walkTestManager.StartMainTest();
                     break;
                 case AppState.Result:
-                    _canvasManager.ShowResultPanel(_userData, _test2MWTData, _test6MWTData);
+                    SFXManager.Main.PlayFromSFXObjectLibrary("9hasiltest");
+                    _canvasManager.ShowResultPanel(_userData, _test2MWTData, _test6MWTData, () => NextStage());
                     break;
             }
         }
@@ -105,6 +120,7 @@ namespace WalkingTest
                     UpdateAppStage(AppState.Settings);
                     break;
                 case AppState.Settings:
+                    SFXManager.Main.PlayFromSFXObjectLibrary("4corfirtrial");
                     _canvasManager.ShowPopupConfirmation(
                         title: $"Mulai Percobaan",
                         message: $"Sebelum tes, apakah Kamu ingin melakukan percobaan dulu?",
@@ -124,6 +140,9 @@ namespace WalkingTest
                 case AppState.MainTest:
                     UpdateAppStage(AppState.Result);
                     break;
+                case AppState.Result:
+                    SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex);
+                    break;
             }
         }
 
@@ -134,11 +153,20 @@ namespace WalkingTest
                 return;
             }
 
-            _userData.username = $"{newData.username}";
-            _userData.age = newData.age;
-            _userData.gender = newData.gender;
+            _userData = newData;
 
             NextStage();
+        }
+
+        public void StoreTestResultData(TestResultData _new2MWT, TestResultData _new6MWT)
+        {
+            if (_new2MWT == null || _new6MWT == null)
+            {
+                return;
+            }
+
+            _test2MWTData = _new2MWT;
+            _test6MWTData = _new6MWT;
         }
     }
 }

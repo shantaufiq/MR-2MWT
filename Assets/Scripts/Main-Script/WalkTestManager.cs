@@ -11,9 +11,9 @@ namespace WalkingTest
     {
         [Header("Component | Countdown & Timer")]
         [SerializeField] private float _testDuration = 360f;
-        [SerializeField] private int _countdownDuration = 3;
-        [SerializeField] private List<TimerThreshold> _2MWTInstruction = new List<TimerThreshold>() { };
-        [SerializeField] private List<TimerThreshold> _6MWTInstruction = new List<TimerThreshold>() { };
+        [SerializeField] private SFXObject _countdownAudio;
+        [SerializeField] private List<TimerThreshold> _trialInstruction = new List<TimerThreshold>() { };
+        [SerializeField] private List<TimerThreshold> _mainTestInstruction = new List<TimerThreshold>() { };
         private List<TimerThreshold> m_thresholdEvents = new List<TimerThreshold>() { };
         private Action onTimerCompleted;
         private Coroutine _countdownRoutine;
@@ -23,15 +23,26 @@ namespace WalkingTest
         {
             [Tooltip("Label opsional agar mudah dikenali di Inspector.")]
             public string name;
+            public PopupType type;
 
+            [Serializable]
+            public enum PopupType
+            {
+                None, Popup, Hint
+            }
+
+            [TextArea]
+            public string textInformation;
+            public SFXObject audioClip;
+            public Sprite icon;
+
+            [Header("Settings")]
             [Tooltip("Saat RemainingTime <= nilai ini (detik), event dipanggil.")]
             [Min(0f)] public float thresholdSeconds = 60f;
-
-            public string textInformation;
-            public AudioClip audioClip;
-            [Range(0.7f, 5f)]
+            [Range(0.7f, 10f)]
             public float delayTimeToHide = 0.8f;
 
+            [Space(8f)]
             [Tooltip("Event yang dipanggil saat melewati/masuk ke ambang ini.")]
             public UnityEvent onThreshold;
 
@@ -53,6 +64,8 @@ namespace WalkingTest
 
         public void StartTrialTest()
         {
+            SFXManager.Main.StopAll();
+            SFXManager.Main.PlayFromSFXObjectLibrary("5trialintro");
             _canvasManager.ShowPanel(5, () =>
             {
                 if (_countdownRoutine != null)
@@ -60,19 +73,36 @@ namespace WalkingTest
                     StopCoroutine(_countdownRoutine);
                     _countdownRoutine = null;
                 }
+                SFXManager.Main.StopAll();
 
                 if (m_thresholdEvents.Count > 0) m_thresholdEvents.Clear();
-                m_thresholdEvents = _2MWTInstruction;
+                m_thresholdEvents = _trialInstruction;
 
-                _countdownRoutine = StartCoroutine(CountdownRoutine(_countdownDuration, () =>
+                _countdownRoutine = StartCoroutine(CountdownRoutine(() =>
                 {
-                    _canvasManager.SetActiveCountDown(false, $"Jalan", "Jalan ketika hitungan selesai");
+                    _wayPointGenerator.onReachingLap.AddListener((int n) =>
+                    {
+                        if (n == 1)
+                        {
+                            ResetTimer();
+
+                            _canvasManager.ShowPanel(6, () =>
+                            {
+                                _applicationManager.NextStage();
+                            });
+                            SFXManager.Main.PlayFromSFXObjectLibrary("6trialsuccess");
+                        }
+                    });
+
+                    _canvasManager.SetActiveCountDown(false, $"", "");
                     StartTimer(() =>
                     {
+                        _canvasManager.SetActiveCountDown(false, $"", "");
                         _canvasManager.ShowPanel(6, () =>
                         {
                             _applicationManager.NextStage();
                         });
+                        SFXManager.Main.PlayFromSFXObjectLibrary("6trialsuccess");
                     });
 
                     //! hitung apakah player sudah melewati 1 putaran
@@ -84,6 +114,8 @@ namespace WalkingTest
         {
             //! check apakah player sudah di titik start atau belum
 
+            SFXManager.Main.StopAll();
+            SFXManager.Main.PlayFromSFXObjectLibrary("7testintro");
             _canvasManager.ShowPanel(7, () =>
             {
                 if (_countdownRoutine != null)
@@ -91,35 +123,67 @@ namespace WalkingTest
                     StopCoroutine(_countdownRoutine);
                     _countdownRoutine = null;
                 }
+                SFXManager.Main.StopAll();
 
                 if (m_thresholdEvents.Count > 0) m_thresholdEvents.Clear();
-                m_thresholdEvents = _6MWTInstruction;
+                m_thresholdEvents = _mainTestInstruction;
 
-                _countdownRoutine = StartCoroutine(CountdownRoutine(_countdownDuration, () =>
+                _countdownRoutine = StartCoroutine(CountdownRoutine(() =>
                 {
-                    _canvasManager.SetActiveCountDown(false, $"Jalan", "Jalan ketika hitungan selesai");
+                    _canvasManager.SetActiveCountDown(false, $"", "J");
                     StartTimer(() =>
                     {
+                        SFXManager.Main.PlayFromSFXObjectLibrary("8testsuccess");
+                        _canvasManager.SetActiveCountDown(false, $"", "");
+                        _wayPointGenerator.HideTrackway();
+                        StoreTestResult();
+
                         _canvasManager.ShowPanel(8, () =>
                         {
                             _applicationManager.NextStage();
                         });
-
-                        _wayPointGenerator.HideTrackway();
-                        //! send player score
                     });
                 }));
             });
         }
 
-        #region Timer & Countdown
-        private IEnumerator CountdownRoutine(int startValue, Action onFinished)
+        private void StoreTestResult()
         {
-            int current = startValue;
+            TestResultData _2mwt = new();
+            _2mwt.totalDistance = 12;
+            _2mwt.correctWay = 10;
+            _2mwt.wrongWay = 2;
+            _2mwt.walkingSpeed = 5;
+            _2mwt.totalLaps = 3;
+            _2mwt.stepsCount = 50;
+
+            TestResultData _6mwt = new();
+            _6mwt.totalDistance = 24;
+            _6mwt.correctWay = 20;
+            _6mwt.wrongWay = 4;
+            _6mwt.walkingSpeed = 3;
+            _6mwt.totalLaps = 6;
+            _6mwt.stepsCount = 100;
+
+            _applicationManager.StoreTestResultData(_2mwt, _6mwt);
+        }
+
+        #region Timer & Countdown
+        private IEnumerator CountdownRoutine(Action onFinished)
+        {
+            SFXManager.Main.Play(_countdownAudio);
+            int current = 4;
             while (current >= 0)
             {
-                string val = current > 0 ? current.ToString() : "Jalan";
-                _canvasManager.SetActiveCountDown(true, $"{val}", "Jalan ketika hitungan selesai");
+                if (current == 4)
+                {
+                    _canvasManager.SetActiveCountDown(true, $"Bersiap", "Jalan ketika hitungan selesai");
+                }
+                else
+                {
+                    string val = current > 0 ? current.ToString() : "Jalan";
+                    _canvasManager.SetActiveCountDown(true, $"{val}", "Jalan ketika hitungan selesai");
+                }
 
                 yield return new WaitForSeconds(1f);
 
@@ -199,14 +263,21 @@ namespace WalkingTest
                     th._fired = true;
                     th.onThreshold?.Invoke();
 
-                    //! Tampilkan hint
+                    if (Mathf.Abs(_remainingTime - th.thresholdSeconds) < 3f)
+                    {
+                        if (th.type == TimerThreshold.PopupType.Hint && th.icon)
+                        {
+                            _canvasManager.SetActiveHint(th.icon, th.textInformation, th.delayTimeToHide);
+                        }
 
-                    // Animasi scale menggunakan DOTween
-                    // Mulai dari scale 0
-                    // Animasi scale ke 1 dalam 0.3 detik
+                        if (th.type == TimerThreshold.PopupType.Popup)
+                        {
+                            _canvasManager.SetActiveCountDown(true, $"{th.textInformation}", "Berhenti ketika waktu selesai");
+                        }
 
-                    // Setelah 0.9 detik, animasikan scale kembali ke 0
-                    // Animasi kembali ke scale 0 dalam 0.3 detik
+                        if (th.audioClip)
+                            SFXManager.Main.Play(th.audioClip);
+                    }
                 }
             }
         }
