@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
-using WalkingTest;
 using UnityEngine.Events;
 
 namespace WalkingTest
@@ -14,81 +13,70 @@ namespace WalkingTest
         public enum TrackOrientation { PlusX, MinusX, PlusZ, MinusZ }
 
         [Header("Referensi & Orientasi")]
-        [Tooltip("Posisi player menjadi origin track saat generate.")]
         public Transform player;
-        [Tooltip("Orientasi memanjang lintasan. Bisa diubah runtime via tombol UI.")]
         public TrackOrientation orientation = TrackOrientation.PlusX;
-
-        [Tooltip("Set true agar clockwise otomatis menyesuaikan orientasi sesuai tabel mapping.")]
         public bool matchClockwiseToOrientation = true;
 
-        [Space(2f)]
         [SerializeField] private Button prevBtn;
         [SerializeField] private Button nextBtn;
-        //! [SerializeField] private TMP_Text labelOrientation;
+        [SerializeField] private UIToggleButtonsGroup _toggleRotation;
 
         // ---------- UKURAN TRACK ----------
         [Header("Ukuran (meter)")]
-        [Tooltip("Panjang ruas lurus (jarak antar pusat belokan).")]
         public float straightLength = 10f;
-        [Tooltip("Radius setengah lingkaran di kedua ujung. Lebar oval = 2*radius.")]
         public float radius = 2f;
-        [Tooltip("True = searah jarum jam (belok kanan). False = berlawanan.")]
         public bool clockwise = true;
-
-        [Space(2f)]
-        //! [SerializeField] private Toggle toggleTrackRotation;
-        //! [SerializeField] private TMP_Text labelClockwiseText;
-
-        [SerializeField] private UIToggleButtonsGroup _toggleRotation;
 
         // ---------- SAMPLING ----------
         [Header("Sampling / Kehalusan")]
-        [Tooltip("Jumlah titik per setengah lingkaran.")]
         public int arcSegments = 32;
-        [Tooltip("Jarak sampling ruas lurus.")]
         public float straightStep = 0.25f;
 
         // ---------- KETINGGIAN TRACK ----------
         [Header("Penempatan")]
-        [Tooltip("Ketinggian lintasan pada sumbu Y relatif origin (player).")]
         public float trackY = 0f;
 
         // ---------- CONES ----------
         [Header("Cone Settings")]
         public GameObject conePrefab;
-        [Tooltip("Offset dari tikungan ke arah ruas lurus.")]
         public float coneOffsetFromTurn = 0.3f;
-        [Tooltip("Tinggi Y untuk cone yang di-spawn.")]
         public float coneY = 0.245f;
 
-        private GameObject coneLeftInstance;
-        private GameObject coneRightInstance;
+        [HideInInspector] public GameObject coneLeftInstance;
+        [HideInInspector] public GameObject coneRightInstance;
 
         // ---------- COLLIDERS ----------
         [Header("Track Colliders")]
-        [Tooltip("Bangun collider datar mengikuti lintasan agar bisa diraycast PlayerDistanceTracker.")]
         public bool buildColliders = true;
-        [Tooltip("Lebar jalur yang bisa diinjak (meter).")]
         public float trackWidth = 1.0f;
-        [Tooltip("Ketebalan fisik collider (meter).")]
         public float colliderThickness = 0.05f;
-        [Tooltip("Layer untuk collider lintasan (set supaya termasuk di greenMask).")]
-        public int trackLayer = 0; // set ke layer 'TrackGreen' atau sejenisnya
-        [Tooltip("Parent opsional untuk semua collider segmen.")]
+        public int trackLayer = 0;
         public Transform collidersParent;
 
         // ---------- LAP COUNTER ----------
         [Header("Lap Counter - Checkpoint Settings")]
-        public int checkpointCount = 4;   // misal 4 checkpoint (bawah, kanan, atas, kiri)
+        public int checkpointCount = 4;
         private List<GameObject> checkpointColliders = new List<GameObject>();
-        private int currentCheckpointIndex = 0;
+
         public int lapsCompleted;
         public bool lapCountingEnabled = false;
 
+        [Space(8f)]
         public UnityEvent<int> onReachingLap;
+        public UnityEvent onWrongWay;
+        public UnityEvent onBackToCorrectWay;
 
-        private GameObject collidersRoot; // container runtime
+        private GameObject collidersRoot;
+
+        // ---------- LAP STATE ----------
+        private int lastCheckpointPassed = -1;
+        private bool isWrongWay = false;
+        private bool lapStarted = false;
+        private bool passedStartEarly = false;
+        private bool passedMiddle = false;
+        private bool passedEndLate = false;
+
+        private int cpA, cpB, midCp, cpEndA, cpEndB, cpTotal;
 
         // ---------- INTERNAL ----------
         private LineRenderer lr;
@@ -96,6 +84,11 @@ namespace WalkingTest
 
         private TrackOrientation[] tOrientationValues;
         private int tOrientationIndex;
+
+
+        // =========================================================
+        // ======================= AWAKE ============================
+        // =========================================================
 
         void Awake()
         {
@@ -110,231 +103,200 @@ namespace WalkingTest
 
             if (prevBtn) prevBtn.onClick.AddListener(Prev);
             if (nextBtn) nextBtn.onClick.AddListener(Next);
-
-            // if (toggleTrackRotation)
-            // {
-            //     toggleTrackRotation.onValueChanged.AddListener(ToggleClockwiseChanged);
-            //     toggleTrackRotation.isOn = true;
-            //     ToggleClockwiseChanged(true);
-            // }
-
-            _toggleRotation.onToggleChanged.AddListener(UpdateRotation);
+            if (_toggleRotation) _toggleRotation.onToggleChanged.AddListener(UpdateRotation);
         }
 
-        public void UpdateRotation(int val)
+
+        // =========================================================
+        // ================== ORIENTATION API =======================
+        // =========================================================
+
+        void UpdateRotation(int val)
         {
             ToggleClockwiseChanged(val == 0);
         }
 
-        void Start()
-        {
-            if (matchClockwiseToOrientation)
-                clockwise = _toggleRotation.GetActiveIndex() == 1 ? !DefaultClockwiseFor(tOrientationValues[tOrientationIndex]) : DefaultClockwiseFor(tOrientationValues[tOrientationIndex]);
-
-            if (Application.isPlaying)
-            {
-                Generate();
-                SpawnCones();
-                if (buildColliders) BuildTrackColliders();
-            }
-        }
-
-        public void HideTrackway()
-        {
-            coneLeftInstance.SetActive(false);
-            coneRightInstance.SetActive(false);
-            lr.enabled = false;
-        }
-
-        // =========================================================
-        // ===================  ORIENTATION API  ===================
-        // Panggil fungsi2 ini dari Button.onClick
         public void Next()
         {
-            SetByIndex((tOrientationIndex + 1) % tOrientationValues.Length);
+            // Rotasi searah jarum jam (CW)
+            orientation = RotateCW(orientation);
+            SetOrientation(orientation);
         }
 
         public void Prev()
         {
-            int len = tOrientationValues.Length;
-            SetByIndex((tOrientationIndex - 1 + len) % len);     // wrap-around ke belakang
+            // Rotasi berlawanan jarum jam (CCW)
+            orientation = RotateCCW(orientation);
+            SetOrientation(orientation);
         }
+
+        private TrackOrientation RotateCW(TrackOrientation o)
+        {
+            return o switch
+            {
+                TrackOrientation.PlusX => TrackOrientation.MinusZ,
+                TrackOrientation.MinusZ => TrackOrientation.MinusX,
+                TrackOrientation.MinusX => TrackOrientation.PlusZ,
+                TrackOrientation.PlusZ => TrackOrientation.PlusX,
+                _ => o
+            };
+        }
+
+        private TrackOrientation RotateCCW(TrackOrientation o)
+        {
+            return o switch
+            {
+                TrackOrientation.PlusX => TrackOrientation.PlusZ,
+                TrackOrientation.PlusZ => TrackOrientation.MinusX,
+                TrackOrientation.MinusX => TrackOrientation.MinusZ,
+                TrackOrientation.MinusZ => TrackOrientation.PlusX,
+                _ => o
+            };
+        }
+
 
         private void SetByIndex(int i)
         {
             tOrientationIndex = i;
-            var value = tOrientationValues[tOrientationIndex];
-
-            SetOrientation(value);
-
-            // if (labelOrientation) labelOrientation.text = tOrientationValues[tOrientationIndex].ToString();
+            SetOrientation(tOrientationValues[tOrientationIndex]);
         }
 
         public void ToggleClockwiseChanged(bool isOn)
         {
             clockwise = isOn == false ? !DefaultClockwiseFor(orientation) : DefaultClockwiseFor(orientation);
             RegenerateAll();
-
-            // if (!labelClockwiseText) return;
-            // labelClockwiseText.text = isOn ? "Searah Jarum Jam" : "Berlawanan Jarum Jam";
         }
 
         public void SetOrientation(TrackOrientation o)
         {
             orientation = o;
-            if (matchClockwiseToOrientation)
+            if (matchClockwiseToOrientation && _toggleRotation != null)
                 clockwise = _toggleRotation.GetActiveIndex() == 1 ? !DefaultClockwiseFor(o) : DefaultClockwiseFor(o);
+
             RegenerateAll();
         }
 
-        bool DefaultClockwiseFor(TrackOrientation o)
-        {
-            // Mapping sesuai permintaan:
-            // PlusX  -> true
-            // MinusX -> false
-            // PlusZ  -> false
-            // MinusZ -> true
-            switch (o)
+        bool DefaultClockwiseFor(TrackOrientation o) =>
+            o switch
             {
-                case TrackOrientation.PlusX: return true;
-                case TrackOrientation.MinusX: return false;
-                case TrackOrientation.PlusZ: return false;
-                case TrackOrientation.MinusZ: return true;
-                default: return true;
-            }
-        }
+                TrackOrientation.PlusX => true,
+                TrackOrientation.MinusX => false,
+                TrackOrientation.PlusZ => false,
+                TrackOrientation.MinusZ => true,
+                _ => true
+            };
 
-        public void RegenerateAll()
-        {
-            Generate();
-            SpawnCones();
-            if (buildColliders) BuildTrackColliders(); else ClearTrackColliders();
 
-            currentCheckpointIndex = 0;
-            lapsCompleted = 0;
-        }
+        // =========================================================
+        // ================= TRACK GENERATION =======================
         // =========================================================
 
-        // Hitung RIGHT (arah memanjang) & FWD (arah lebar) sesuai orientasi (world axes)
         void ResolveAxes(out Vector3 RIGHT, out Vector3 FWD)
         {
             switch (orientation)
             {
-                case TrackOrientation.PlusX:
-                    RIGHT = Vector3.right; FWD = Vector3.forward; break;
-                case TrackOrientation.MinusX:
-                    RIGHT = Vector3.left; FWD = Vector3.forward; break;
-                case TrackOrientation.PlusZ:
-                    RIGHT = Vector3.forward; FWD = Vector3.right; break;
-                case TrackOrientation.MinusZ:
-                    RIGHT = Vector3.back; FWD = Vector3.right; break;
-                default:
-                    RIGHT = Vector3.right; FWD = Vector3.forward; break;
+                case TrackOrientation.PlusX: RIGHT = Vector3.right; FWD = Vector3.forward; break;
+                case TrackOrientation.MinusX: RIGHT = Vector3.left; FWD = Vector3.forward; break;
+                case TrackOrientation.PlusZ: RIGHT = Vector3.forward; FWD = Vector3.right; break;
+                case TrackOrientation.MinusZ: RIGHT = Vector3.back; FWD = Vector3.right; break;
+                default: RIGHT = Vector3.right; FWD = Vector3.forward; break;
             }
         }
 
         public void Generate()
         {
-            if (player == null)
+            if (!player)
             {
-                Debug.LogWarning("Player belum di-assign ke OvalTrackGenerator.");
+                Debug.LogWarning("Player belum di-assign ke TrackWaypointGenerator.");
                 return;
             }
 
             pts.Clear();
 
-            // Validasi
             radius = Mathf.Max(0.01f, radius);
             straightLength = Mathf.Max(0.01f, straightLength);
             arcSegments = Mathf.Clamp(arcSegments, 8, 256);
             straightStep = Mathf.Max(0.05f, straightStep);
 
-            // Basis sumbu & origin
             ResolveAxes(out Vector3 RIGHT, out Vector3 FWD);
             Vector3 ORI = player.position;
-
-            // Helper: koordinat lokal oval (lx,lz) -> world
             Vector3 P(float lx, float lz) => ORI + RIGHT * lx + FWD * lz + Vector3.up * trackY;
 
             float L = straightLength;
             float R = radius;
 
-            // Z bawah/atas (sepanjang FWD)
             float zBottom = 0f;
             float zTop = clockwise ? -2f * R : 2f * R;
 
-            // 1) Straight bawah (0,zBottom) -> (L,zBottom)
-            int sSteps = Mathf.Max(1, Mathf.CeilToInt(L / straightStep));
-            for (int i = 0; i <= sSteps; i++)
-            {
-                float t = (float)i / sSteps;
-                pts.Add(P(L * t, zBottom));
-            }
+            int sSteps = Mathf.CeilToInt(L / straightStep);
 
-            // 2) Arc kanan (pusat di (L, ±R))
-            if (!clockwise) // CCW
+            // 1. Straight bottom
+            for (int i = 0; i <= sSteps; i++)
+                pts.Add(P(L * (i / (float)sSteps), zBottom));
+
+            // 2. Arc right
+            if (!clockwise)
             {
                 Vector3 centerRight = P(L, R);
                 for (int i = 1; i <= arcSegments; i++)
                 {
-                    float a = Mathf.Lerp(-Mathf.PI * 0.5f, Mathf.PI * 0.5f, (float)i / arcSegments);
+                    float a = Mathf.Lerp(-Mathf.PI * .5f, Mathf.PI * .5f, i / (float)arcSegments);
                     pts.Add(centerRight + RIGHT * (R * Mathf.Cos(a)) + FWD * (R * Mathf.Sin(a)));
                 }
             }
-            else // CW
+            else
             {
                 Vector3 centerRight = P(L, -R);
                 for (int i = 1; i <= arcSegments; i++)
                 {
-                    float a = Mathf.Lerp(Mathf.PI * 0.5f, -Mathf.PI * 0.5f, (float)i / arcSegments);
+                    float a = Mathf.Lerp(Mathf.PI * .5f, -Mathf.PI * .5f, i / (float)arcSegments);
                     pts.Add(centerRight + RIGHT * (R * Mathf.Cos(a)) + FWD * (R * Mathf.Sin(a)));
                 }
             }
 
-            // 3) Straight atas (L,zTop) -> (0,zTop)
+            // 3. Straight top
             for (int i = 1; i <= sSteps; i++)
-            {
-                float t = (float)i / sSteps;
-                pts.Add(P(L * (1f - t), zTop));
-            }
+                pts.Add(P(L * (1f - i / (float)sSteps), zTop));
 
-            // 4) Arc kiri (pusat di (0, ±R)) — mirror di X (pakai -cos)
-            if (!clockwise) // CCW
+            // 4. Arc left
+            if (!clockwise)
             {
                 Vector3 centerLeft = P(0f, R);
                 for (int i = 1; i <= arcSegments; i++)
                 {
-                    float a = Mathf.Lerp(Mathf.PI * 0.5f, -Mathf.PI * 0.5f, (float)i / arcSegments);
+                    float a = Mathf.Lerp(Mathf.PI * .5f, -Mathf.PI * .5f, i / (float)arcSegments);
                     float lx = -R * Mathf.Cos(a);
                     float lz = R * Mathf.Sin(a);
                     pts.Add(centerLeft + RIGHT * lx + FWD * lz);
                 }
             }
-            else // CW
+            else
             {
                 Vector3 centerLeft = P(0f, -R);
                 for (int i = 1; i <= arcSegments; i++)
                 {
-                    float a = Mathf.Lerp(-Mathf.PI * 0.5f, Mathf.PI * 0.5f, (float)i / arcSegments);
+                    float a = Mathf.Lerp(-Mathf.PI * .5f, Mathf.PI * .5f, i / (float)arcSegments);
                     float lx = -R * Mathf.Cos(a);
                     float lz = R * Mathf.Sin(a);
                     pts.Add(centerLeft + RIGHT * lx + FWD * lz);
                 }
             }
 
-            // Apply ke LineRenderer
             lr.positionCount = pts.Count;
             lr.SetPositions(pts.ToArray());
         }
 
-        // Spawn 2 cone dari prefab di tengah lebar lintasan, dekat tikungan
+
+        // =========================================================
+        // ===================== CONE SPAWN =========================
+        // =========================================================
+
         public void SpawnCones()
         {
-            if (conePrefab == null) return;
+            if (!conePrefab) return;
 
-            // Hapus yang lama
-            if (coneLeftInstance != null) Destroy(coneLeftInstance);
-            if (coneRightInstance != null) Destroy(coneRightInstance);
+            if (coneLeftInstance) Destroy(coneLeftInstance);
+            if (coneRightInstance) Destroy(coneRightInstance);
 
             ResolveAxes(out Vector3 RIGHT, out Vector3 FWD);
             Vector3 ORI = player ? player.position : transform.position;
@@ -344,40 +306,39 @@ namespace WalkingTest
 
             float zBottom = 0f;
             float zTop = clockwise ? -2f * R : 2f * R;
-            float zCenter = 0.5f * (zBottom + zTop);
+            float zCenter = (zBottom + zTop) * .5f;
 
             float xLeft = Mathf.Clamp(coneOffsetFromTurn, 0f, L);
             float xRight = Mathf.Clamp(L - coneOffsetFromTurn, 0f, L);
 
             Vector3 P(float lx, float lz) => ORI + RIGHT * lx + FWD * lz;
 
-            Vector3 leftPos = P(xLeft, zCenter); leftPos.y = coneY;
-            Vector3 rightPos = P(xRight, zCenter); rightPos.y = coneY;
+            Vector3 leftPos = P(xLeft, zCenter);
+            leftPos.y = coneY;
+
+            Vector3 rightPos = P(xRight, zCenter);
+            rightPos.y = coneY;
 
             coneLeftInstance = Instantiate(conePrefab, leftPos, Quaternion.identity);
             coneRightInstance = Instantiate(conePrefab, rightPos, Quaternion.identity);
 
-            // Arahkan cone mengikuti arah memanjang lintasan
             Quaternion look = Quaternion.LookRotation(RIGHT, Vector3.up);
             coneLeftInstance.transform.rotation = look;
             coneRightInstance.transform.rotation = look;
         }
 
-        // (Opsional) set total panjang lintasan lalu auto hitung straight
-        public void SetTotalLength(float totalLength)
-        {
-            float minTotal = 2f * Mathf.PI * Mathf.Max(radius, 0.01f);
-            totalLength = Mathf.Max(totalLength, minTotal + 1e-4f);
-            straightLength = (totalLength - 2f * Mathf.PI * radius) * 0.5f;
-        }
 
-        // ===================  COLLIDER BUILDER  ===================
+        // =========================================================
+        // ==================== COLLIDER BUILDER ====================
+        // =========================================================
+
         void ClearTrackColliders()
         {
-            if (collidersRoot != null)
+            if (collidersRoot)
             {
                 if (Application.isPlaying) Destroy(collidersRoot);
                 else DestroyImmediate(collidersRoot);
+
                 collidersRoot = null;
             }
         }
@@ -389,16 +350,13 @@ namespace WalkingTest
             ClearTrackColliders();
             checkpointColliders.Clear();
 
-            // Root/parent
             collidersRoot = new GameObject("TrackColliders");
-            var parent = collidersParent != null ? collidersParent : transform;
-            collidersRoot.transform.SetParent(parent, worldPositionStays: true);
+            var parent = collidersParent ? collidersParent : transform;
+            collidersRoot.transform.SetParent(parent, true);
 
-            // Lebar & tebal aman
             float width = Mathf.Max(0.05f, trackWidth);
             float thick = Mathf.Max(0.01f, colliderThickness);
 
-            // Buat collider per segmen
             int count = pts.Count;
             for (int i = 0; i < count; i++)
             {
@@ -406,32 +364,28 @@ namespace WalkingTest
                 Vector3 p1 = pts[(i + 1) % count];
 
                 Vector3 dir = p1 - p0;
-                // Abaikan komponen Y; permukaan mendatar
                 dir.y = 0f;
+
                 float segLen = dir.magnitude;
                 if (segLen < 1e-3f) continue;
                 dir /= segLen;
 
-                float rendererY = pts.Count > 0 ? pts[0].y : trackY;
-                Vector3 mid = 0.5f * (p0 + p1);
-                float centerY = rendererY + 0.2f;
+                Vector3 mid = (p0 + p1) * .5f;
+                float centerY = pts[0].y + 0.2f;
 
-                // GameObject segmen
                 var go = new GameObject($"SegCol_{i:000}");
                 go.layer = trackLayer;
-                go.transform.SetParent(collidersRoot.transform, worldPositionStays: false);
+                go.transform.SetParent(collidersRoot.transform, false);
                 go.transform.position = new Vector3(mid.x, centerY, mid.z);
                 go.transform.rotation = Quaternion.LookRotation(dir, Vector3.up);
 
-                // Pasang BoxCollider mendatar: (x=width, y=thickness, z=length)
                 var box = go.AddComponent<BoxCollider>();
                 box.size = new Vector3(width, thick, segLen);
-                box.center = Vector3.zero;
                 box.isTrigger = true;
 
-                // Tandai beberapa segmen sebagai checkpoint
                 checkpointCount = Mathf.Clamp(checkpointCount, 2, Mathf.Max(2, count));
                 int step = Mathf.Max(1, count / checkpointCount);
+
                 if (i % step == 0)
                 {
                     var cp = go.AddComponent<TrackCheckpoint>();
@@ -440,38 +394,180 @@ namespace WalkingTest
                     checkpointColliders.Add(go);
                 }
             }
+
+            cpTotal = checkpointColliders.Count;
+
+            cpA = 0;
+            cpB = Mathf.Min(1, cpTotal - 1);
+
+            midCp = cpTotal / 2;
+
+            cpEndA = cpTotal - 2;
+            cpEndB = cpTotal - 1;
+
+            ResetLapState();
         }
+
+
+        // =========================================================
+        // =================== LAP SYSTEM LOGIC =====================
+        // =========================================================
 
         public void OnCheckpointPassed(int index)
         {
-            if (!lapCountingEnabled) return;  // <-- cegah hitung sebelum start
+            if (!lapCountingEnabled) return;
 
-            if (index == currentCheckpointIndex)
+            // ====================================================
+            // WRONG WAY + BACK TO CORRECT WAY (NEW)
+            // ====================================================
+            if (lastCheckpointPassed != -1)
             {
-                currentCheckpointIndex++;
-                if (currentCheckpointIndex >= checkpointCount)
+                // Wrong direction
+                if (index < lastCheckpointPassed)
+                {
+                    if (!isWrongWay)
+                    {
+                        isWrongWay = true;
+                        onWrongWay?.Invoke();
+                    }
+                }
+                // Correct direction again
+                else if (index > lastCheckpointPassed)
+                {
+                    if (isWrongWay)
+                    {
+                        isWrongWay = false;
+                        onBackToCorrectWay?.Invoke();
+                    }
+                }
+            }
+
+            lastCheckpointPassed = index;
+
+            // ====================================================
+            // LAP LOGIC (UNCHANGED)
+            // ====================================================
+
+            if (!lapStarted)
+            {
+                if (index == cpA)
+                {
+                    lapStarted = true;
+
+                    passedStartEarly = true;
+                    passedMiddle = false;
+                    passedEndLate = false;
+                }
+                return;
+            }
+
+            if (index == cpA || index == cpB)
+                passedStartEarly = true;
+
+            if (index == midCp)
+                passedMiddle = true;
+
+            if (index == cpEndA || index == cpEndB)
+                passedEndLate = true;
+
+            if (index == cpA)
+            {
+                if (passedStartEarly && passedMiddle && passedEndLate)
                 {
                     lapsCompleted++;
                     onReachingLap?.Invoke(lapsCompleted);
-                    currentCheckpointIndex = 0;
                 }
-            }
-            else
-            {
-                currentCheckpointIndex = 0;
+
+                passedStartEarly = true;
+                passedMiddle = false;
+                passedEndLate = false;
             }
         }
 
-        public void ResetLapsAndCheckpoints()
+        public void ResetLapState()
         {
-            currentCheckpointIndex = 0;
             lapsCompleted = 0;
+            lapStarted = false;
+
+            passedStartEarly = false;
+            passedMiddle = false;
+            passedEndLate = false;
         }
 
         public void EnableLapCounting(bool enabled)
         {
             lapCountingEnabled = enabled;
-            if (!enabled) ResetLapsAndCheckpoints();
+            if (!enabled) ResetLapState();
+        }
+
+
+        // =========================================================
+        // ================== TRACK REGENERATE API ==================
+        // =========================================================
+
+        /// <summary>
+        /// Regenerate isi track (line, cones, colliders) tanpa mengubah on/off line renderer.
+        /// Dipakai ketika orientasi / clockwise diubah.
+        /// </summary>
+        public void RegenerateAll()
+        {
+            // simpan visibility saat ini
+            bool wasVisible = lr.enabled;
+
+            // update jalur & geometry
+            Generate();
+
+            if (wasVisible)
+            {
+                // jika sedang terlihat, rebuild semuanya
+                SpawnCones();
+
+                if (buildColliders)
+                    BuildTrackColliders();
+                else
+                    ClearTrackColliders();
+            }
+            else
+            {
+                // kalau lagi disembunyikan, pastikan cones & colliders tidak aktif
+                if (coneLeftInstance) coneLeftInstance.SetActive(false);
+                if (coneRightInstance) coneRightInstance.SetActive(false);
+                ClearTrackColliders();
+            }
+
+            ResetLapState();
+        }
+
+
+        // =========================================================
+        // ================= TRACK VISIBILITY API ===================
+        // =========================================================
+
+        public void ShowTrack()
+        {
+            lr.enabled = true;
+            RegenerateAll();
+
+            Debug.Log("TRACK SHOWN");
+        }
+
+        public void HideTrack()
+        {
+            lr.enabled = false;
+
+            if (coneLeftInstance) coneLeftInstance.SetActive(false);
+            if (coneRightInstance) coneRightInstance.SetActive(false);
+
+            ClearTrackColliders();
+            ResetLapState();
+
+            Debug.Log("TRACK HIDDEN");
+        }
+
+        public void ToggleTrack(bool show)
+        {
+            if (show) ShowTrack();
+            else HideTrack();
         }
     }
 }

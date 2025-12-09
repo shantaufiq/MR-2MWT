@@ -74,7 +74,7 @@ public class GameManager : MonoBehaviour
             timeManager.StartTimer();  // pakai TimeManager agar tick & threshold tetap berjalan
         }
 
-        waypointGenerator?.ResetLapsAndCheckpoints();
+        // waypointGenerator?.ResetLapsAndCheckpoints();
         waypointGenerator?.EnableLapCounting(true);
 
         distanceTracker.InitialPlayerPosition();
@@ -124,7 +124,7 @@ public class GameManager : MonoBehaviour
         if (waypointGenerator) waypointGenerator.lapsCompleted = 0;
 
         waypointGenerator?.EnableLapCounting(false);
-        waypointGenerator?.ResetLapsAndCheckpoints();
+        // waypointGenerator?.ResetLapsAndCheckpoints();
     }
 
     private void ResetRunStats()

@@ -146,7 +146,7 @@ namespace WalkingTest
                         _distanceTracker.GetResult((x) => _6MWTData.totalDistance = x, (x) => _6MWTData.correctWay = x, (x) => _6MWTData.wrongWay = x);
                         SFXManager.Main.PlayFromSFXObjectLibrary("8testsuccess");
                         _canvasManager.SetActiveCountDown(false, $"", "");
-                        _wayPointGenerator.HideTrackway();
+                        _wayPointGenerator.HideTrack();
                         StoreTestResult();
 
                         _canvasManager.ShowPanel(8, () =>

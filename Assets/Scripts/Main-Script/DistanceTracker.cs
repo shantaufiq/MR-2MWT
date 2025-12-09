@@ -1,8 +1,6 @@
 using System;
 using UnityEngine;
 
-namespace WalkingTest
-{
     public class DistanceTracker : MonoBehaviour
     {
         [Header("Result Data")]
@@ -111,4 +109,3 @@ namespace WalkingTest
             }
         }
     }
-}
