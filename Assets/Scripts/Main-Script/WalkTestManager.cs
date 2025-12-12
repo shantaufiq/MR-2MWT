@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using System;
 using UnityEngine.Events;
+using System.Linq;
 
 namespace WalkingTest
 {
@@ -12,6 +13,15 @@ namespace WalkingTest
         [Header("Walking Test Result Data")]
         [SerializeField] private TestResultData _2MWTData = new();
         [SerializeField] private TestResultData _6MWTData = new();
+
+        [Header("Score Item & Star Badge")]
+        [SerializeField] private int _collectedItemCount = 0;
+        [SerializeField] private List<ItemObject> _itemObjectList;
+        [SerializeField] private GameObject _boxItem;
+        [SerializeField] private TextMeshPro _scoreText;
+        [SerializeField] private List<MeshRenderer> _starList;
+        [SerializeField] private Material _yellowMaterial;
+        [SerializeField] private Material _greyMaterial;
 
         [Header("Component | Countdown & Timer")]
         [SerializeField] private float _testDuration = 360f;
@@ -72,6 +82,10 @@ namespace WalkingTest
             SFXManager.Main.StopAll();
             SFXManager.Main.PlayFromSFXObjectLibrary("5trialintro");
 
+            ResetStar();
+            _boxItem.SetActive(false);
+            ResetScore();
+
             _wayPointGenerator.SpawnGamificationArena();
             _canvasManager.ShowPanel(5, () =>
             {
@@ -87,8 +101,14 @@ namespace WalkingTest
 
                 _countdownRoutine = StartCoroutine(CountdownRoutine(() =>
                 {
+                    foreach (var obj in _itemObjectList)
+                    {
+                        obj.gameObject.SetActive(true);
+                    }
+
                     _distanceTracker.StartTracking();
 
+                    //! hitung apakah player sudah melewati 1 putaran
                     _wayPointGenerator.onReachingLap.RemoveAllListeners();
                     _wayPointGenerator.onReachingLap.AddListener((int n) =>
                     {
@@ -114,8 +134,6 @@ namespace WalkingTest
                         });
                         SFXManager.Main.PlayFromSFXObjectLibrary("6trialsuccess");
                     });
-
-                    //! hitung apakah player sudah melewati 1 putaran
                 }));
             });
         }
@@ -126,6 +144,10 @@ namespace WalkingTest
 
             SFXManager.Main.StopAll();
             SFXManager.Main.PlayFromSFXObjectLibrary("7testintro");
+
+            ResetScore();
+            ResetStar();
+            _boxItem.SetActive(true);
 
             _wayPointGenerator.SpawnGamificationArena();
             _canvasManager.ShowPanel(7, () =>
@@ -142,12 +164,28 @@ namespace WalkingTest
 
                 _countdownRoutine = StartCoroutine(CountdownRoutine(() =>
                 {
+                    _wayPointGenerator.onReachingLap.RemoveAllListeners();
+                    _wayPointGenerator.onReachingLap.AddListener((int n) =>
+                    {
+                        foreach (var obj in _itemObjectList)
+                        {
+                            obj.gameObject.SetActive(true);
+                        }
+                    });
+
+                    foreach (var obj in _itemObjectList)
+                    {
+                        obj.gameObject.SetActive(true);
+                    }
+
                     _distanceTracker.StartTracking();
                     _canvasManager.SetActiveCountDown(false, $"", "J");
                     StartTimer(() =>
                     {
                         _distanceTracker.StopTracking();
                         _distanceTracker.GetResult((x) => _6MWTData.totalDistance = x, (x) => _6MWTData.correctWay = x, (x) => _6MWTData.wrongWay = x);
+                        _6MWTData.totalLaps = _wayPointGenerator.lapsCompleted;
+
                         SFXManager.Main.PlayFromSFXObjectLibrary("8testsuccess");
                         _canvasManager.SetActiveCountDown(false, $"", "");
                         _wayPointGenerator.HideTrack();
@@ -157,6 +195,11 @@ namespace WalkingTest
                         {
                             _applicationManager.NextStage();
                         });
+
+                        foreach (var obj in _itemObjectList)
+                        {
+                            obj.gameObject.SetActive(false);
+                        }
                     });
                 }));
             });
@@ -170,6 +213,7 @@ namespace WalkingTest
         public void GetData2MWT()
         {
             _distanceTracker.GetResult((x) => _2MWTData.totalDistance = x, (x) => _2MWTData.correctWay = x, (x) => _2MWTData.wrongWay = x);
+            _2MWTData.totalLaps = _wayPointGenerator.lapsCompleted;
         }
 
         #region Timer & Countdown
@@ -313,6 +357,45 @@ namespace WalkingTest
                 m_thresholdEvents[i]._fired = false;
         }
 
+        #endregion
+
+        #region Score & Star badge
+        public void AddScore(int newPoint)
+        {
+            _collectedItemCount += newPoint;
+            _scoreText.text = $"{_collectedItemCount}";
+            Debug.Log($"score collected +{newPoint} | total : {_collectedItemCount}");
+
+            if (_itemObjectList.Count(x => !x.gameObject.activeSelf) >= 9 && m_thresholdEvents == _mainTestInstruction)
+            {
+                foreach (var obj in _itemObjectList)
+                {
+                    obj.gameObject.SetActive(true);
+                }
+            }
+        }
+
+        public void ResetScore()
+        {
+            _collectedItemCount = 0;
+            _scoreText.text = $"{_collectedItemCount}";
+        }
+
+        public void ShowStar(int starIndex)
+        {
+            if (starIndex > 5) return;
+
+            SFXManager.Main.PlayFromSFXObjectLibrary("badge");
+            _starList[starIndex].material = _yellowMaterial;
+        }
+
+        public void ResetStar()
+        {
+            foreach (var star in _starList)
+            {
+                star.material = _greyMaterial;
+            }
+        }
         #endregion
     }
 }

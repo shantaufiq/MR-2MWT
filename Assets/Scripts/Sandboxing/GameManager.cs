@@ -75,7 +75,7 @@ public class GameManager : MonoBehaviour
         }
 
         // waypointGenerator?.ResetLapsAndCheckpoints();
-        waypointGenerator?.EnableLapCounting(true);
+        // waypointGenerator?.EnableLapCounting(true);
 
         distanceTracker.InitialPlayerPosition();
     }
@@ -93,13 +93,13 @@ public class GameManager : MonoBehaviour
     {
         // Ambil total jarak & lap dari komponen terkait
         float totalMeters = distanceTracker ? distanceTracker.TotalDistance : 0f; // PlayerDistanceTracker expose TotalDistance
-        int laps = waypointGenerator ? waypointGenerator.lapsCompleted : 0;       // TrackWaypointGenerator.lapsCompleted
+        // int laps = waypointGenerator ? waypointGenerator.lapsCompleted : 0;       // TrackWaypointGenerator.lapsCompleted
 
         // Format meter & cm
         FormatMetersCm(totalMeters, out int m, out int cm);
 
         if (totalDistanceText) totalDistanceText.text = $"{m:0} m {cm:00} cm";
-        if (lapCountText) lapCountText.text = $"{laps} putaran";
+        // if (lapCountText) lapCountText.text = $"{laps} putaran";
 
         if (endPanel) endPanel.SetActive(true);
     }
@@ -121,9 +121,9 @@ public class GameManager : MonoBehaviour
         if (distanceTracker) distanceTracker.enabled = false;
 
         // Reset lap agar perhitungan mulai dari nol
-        if (waypointGenerator) waypointGenerator.lapsCompleted = 0;
+        // if (waypointGenerator) waypointGenerator.lapsCompleted = 0;
 
-        waypointGenerator?.EnableLapCounting(false);
+        // waypointGenerator?.EnableLapCounting(false);
         // waypointGenerator?.ResetLapsAndCheckpoints();
     }
 
@@ -138,7 +138,7 @@ public class GameManager : MonoBehaviour
         }
 
         // Reset lap
-        if (waypointGenerator) waypointGenerator.lapsCompleted = 0;
+        // if (waypointGenerator) waypointGenerator.lapsCompleted = 0;
     }
 
     // --- Helpers ---

@@ -46,7 +46,6 @@ namespace WalkingTest
 
         [Header("Component References")]
         [SerializeField] private CanvasManager _canvasManager;
-        [SerializeField] private TrackWaypointGenerator _wayPointGenerator;
         [SerializeField] private WalkTestManager _walkTestManager;
 
         private void Start()
@@ -87,7 +86,6 @@ namespace WalkingTest
                     break;
                 case AppState.Settings:
                     _canvasManager.ShowPanel(4, () => NextStage());
-                    _wayPointGenerator.gameObject.SetActive(true); // show walking area
                     break;
                 case AppState.Trial:
                     _walkTestManager.StartTrialTest();

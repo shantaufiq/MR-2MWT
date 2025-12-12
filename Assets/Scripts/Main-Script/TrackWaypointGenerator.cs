@@ -14,9 +14,9 @@ namespace WalkingTest
         public enum TrackOrientation { PlusX, MinusX, PlusZ, MinusZ }
 
         [Header("Referensi & Orientasi")]
-        public Transform player;
-        public TrackOrientation orientation = TrackOrientation.PlusX;
-        public bool matchClockwiseToOrientation = true;
+        [SerializeField] private Transform player;
+        [SerializeField] private TrackOrientation orientation = TrackOrientation.PlusX;
+        [SerializeField] private bool matchClockwiseToOrientation = true;
 
         [SerializeField] private Button prevBtn;
         [SerializeField] private Button nextBtn;
@@ -24,35 +24,35 @@ namespace WalkingTest
 
         // ---------- UKURAN TRACK ----------
         [Header("Ukuran (meter)")]
-        public float straightLength = 10f;
-        public float radius = 2f;
-        public bool clockwise = true;
+        [SerializeField] private float straightLength = 10f;
+        [SerializeField] private float radius = 2f;
+        [SerializeField] private bool clockwise = true;
 
         // ---------- SAMPLING ----------
         [Header("Sampling / Kehalusan")]
-        public int arcSegments = 32;
-        public float straightStep = 0.25f;
+        [SerializeField] private int arcSegments = 32;
+        [SerializeField] private float straightStep = 0.25f;
 
         // ---------- KETINGGIAN TRACK ----------
         [Header("Penempatan")]
-        public float trackY = 0f;
+        [SerializeField] private float trackY = 0f;
 
         // ---------- CONES ----------
         [Header("Cone Settings")]
-        public GameObject conePrefab;
-        public float coneOffsetFromTurn = 0.3f;
-        public float coneY = 0.245f;
+        [SerializeField] private GameObject conePrefab;
+        [SerializeField] private float coneOffsetFromTurn = 0.3f;
+        [SerializeField] private float coneY = 0.245f;
 
         [HideInInspector] public GameObject coneLeftInstance;
         [HideInInspector] public GameObject coneRightInstance;
 
         // ---------- COLLIDERS ----------
         [Header("Track Colliders")]
-        public bool buildColliders = true;
-        public float trackWidth = 1.0f;
-        public float colliderThickness = 0.05f;
-        public int trackLayer = 0;
-        public Transform collidersParent;
+        [SerializeField] private bool buildColliders = true;
+        [SerializeField] private float trackWidth = 1.0f;
+        [SerializeField] private float colliderThickness = 0.05f;
+        [SerializeField] private int trackLayer = 0;
+        [SerializeField] private Transform collidersParent;
 
         // ---------- GAMIFICATION ARENA ----------
         [Header("Gamification Arena")]
@@ -69,16 +69,16 @@ namespace WalkingTest
 
         // ---------- LAP COUNTER ----------
         [Header("Lap Counter - Checkpoint Settings")]
-        public int checkpointCount = 4;
+        [SerializeField] private int checkpointCount = 4;
         private List<GameObject> checkpointColliders = new List<GameObject>();
 
         public int lapsCompleted;
-        public bool lapCountingEnabled = false;
+        [SerializeField] private bool lapCountingEnabled = false;
 
         [Space(8f)]
         public UnityEvent<int> onReachingLap;
-        public UnityEvent onWrongWay;
-        public UnityEvent onBackToCorrectWay;
+        [SerializeField] private UnityEvent onWrongWay;
+        [SerializeField] private UnityEvent onBackToCorrectWay;
 
         private GameObject collidersRoot;
 
@@ -130,6 +130,8 @@ namespace WalkingTest
             _gamificationArena.gameObject.SetActive(true);
             _gamificationArena.position = ORI;
             _gamificationArena.rotation = Quaternion.Euler(0f, offset.rotation, 0f);
+
+            RegenerateAll();
         }
 
         // =========================================================
@@ -138,17 +140,17 @@ namespace WalkingTest
 
         void UpdateRotation(int val)
         {
-            ToggleClockwiseChanged(val == 0);
+            ToggleClockwiseChanged(val == 0); //! manggil spawn arrow
         }
 
-        public void Next()
+        private void Next()
         {
             // Rotasi searah jarum jam (CW)
             orientation = RotateCW(orientation);
             SetOrientation(orientation);
         }
 
-        public void Prev()
+        private void Prev()
         {
             // Rotasi berlawanan jarum jam (CCW)
             orientation = RotateCCW(orientation);
@@ -185,13 +187,13 @@ namespace WalkingTest
             SetOrientation(tOrientationValues[tOrientationIndex]);
         }
 
-        public void ToggleClockwiseChanged(bool isOn)
+        private void ToggleClockwiseChanged(bool isOn)
         {
             clockwise = isOn == false ? !DefaultClockwiseFor(orientation) : DefaultClockwiseFor(orientation);
             RegenerateAll();
         }
 
-        public void SetOrientation(TrackOrientation o)
+        private void SetOrientation(TrackOrientation o)
         {
             orientation = o;
             if (matchClockwiseToOrientation && _toggleRotation != null)
@@ -227,7 +229,7 @@ namespace WalkingTest
             }
         }
 
-        public void Generate()
+        private void Generate()
         {
             if (!player)
             {
@@ -315,7 +317,7 @@ namespace WalkingTest
         // ===================== CONE SPAWN =========================
         // =========================================================
 
-        public void SpawnCones()
+        private void SpawnCones()
         {
             if (!conePrefab) return;
 
@@ -508,7 +510,7 @@ namespace WalkingTest
             }
         }
 
-        public void ResetLapState()
+        private void ResetLapState()
         {
             lapsCompleted = 0;
             lapStarted = false;
@@ -518,7 +520,7 @@ namespace WalkingTest
             passedEndLate = false;
         }
 
-        public void EnableLapCounting(bool enabled)
+        private void EnableLapCounting(bool enabled)
         {
             lapCountingEnabled = enabled;
             if (!enabled) ResetLapState();
@@ -533,7 +535,7 @@ namespace WalkingTest
         /// Regenerate isi track (line, cones, colliders) tanpa mengubah on/off line renderer.
         /// Dipakai ketika orientasi / clockwise diubah.
         /// </summary>
-        public void RegenerateAll()
+        private void RegenerateAll()
         {
             // simpan visibility saat ini
             bool wasVisible = lr.enabled;
@@ -567,7 +569,7 @@ namespace WalkingTest
         // ================= TRACK VISIBILITY API ===================
         // =========================================================
 
-        public void ShowTrack()
+        private void ShowTrack()
         {
             lr.enabled = true;
             RegenerateAll();
@@ -588,7 +590,7 @@ namespace WalkingTest
             Debug.Log("TRACK HIDDEN");
         }
 
-        public void ToggleTrack(bool show)
+        private void ToggleTrack(bool show)
         {
             if (show) ShowTrack();
             else HideTrack();

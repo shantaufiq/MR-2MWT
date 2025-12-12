@@ -19,8 +19,8 @@ MonoBehaviour:
   OverlapDuration: 0
   Editions:
   - Name: backsound
-    Soundtrack: {fileID: 8300000, guid: 5b4f4d80cc931c74187397a26137c9db, type: 3}
-    SoundtrackVolume: 1
+    Soundtrack: {fileID: 8300000, guid: ee827db53bf54e3498c14291a0b6f424, type: 3}
+    SoundtrackVolume: 0.2
     TransitionSound: {fileID: 0}
     TransitionVolume: 1
     KeepPlaybackTime: 0
