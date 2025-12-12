@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using UnityEngine.Events;
+using System.Linq;
 
 namespace WalkingTest
 {
@@ -52,6 +53,19 @@ namespace WalkingTest
         public float colliderThickness = 0.05f;
         public int trackLayer = 0;
         public Transform collidersParent;
+
+        // ---------- GAMIFICATION ARENA ----------
+        [Header("Gamification Arena")]
+        [SerializeField] private List<PositionIdentity> _positionIdentity;
+        [SerializeField] private Transform _gamificationArena;
+        [Serializable]
+        public struct PositionIdentity
+        {
+            public TrackOrientation targetOrientation;
+            public bool isForClockWise;
+            public Vector3 position;
+            public float rotation;
+        }
 
         // ---------- LAP COUNTER ----------
         [Header("Lap Counter - Checkpoint Settings")]
@@ -107,6 +121,17 @@ namespace WalkingTest
         }
 
 
+        public void SpawnGamificationArena()
+        {
+            PositionIdentity offset = _positionIdentity.Find((x) => x.targetOrientation == orientation && x.isForClockWise == clockwise);
+            Vector3 ORI = new Vector3(player.position.x, 0f, player.position.z);
+            ORI += offset.position;
+
+            _gamificationArena.gameObject.SetActive(true);
+            _gamificationArena.position = ORI;
+            _gamificationArena.rotation = Quaternion.Euler(0f, offset.rotation, 0f);
+        }
+
         // =========================================================
         // ================== ORIENTATION API =======================
         // =========================================================
@@ -153,7 +178,6 @@ namespace WalkingTest
                 _ => o
             };
         }
-
 
         private void SetByIndex(int i)
         {

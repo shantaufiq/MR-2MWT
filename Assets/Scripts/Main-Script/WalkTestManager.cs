@@ -71,6 +71,8 @@ namespace WalkingTest
         {
             SFXManager.Main.StopAll();
             SFXManager.Main.PlayFromSFXObjectLibrary("5trialintro");
+
+            _wayPointGenerator.SpawnGamificationArena();
             _canvasManager.ShowPanel(5, () =>
             {
                 if (_countdownRoutine != null)
@@ -124,6 +126,8 @@ namespace WalkingTest
 
             SFXManager.Main.StopAll();
             SFXManager.Main.PlayFromSFXObjectLibrary("7testintro");
+
+            _wayPointGenerator.SpawnGamificationArena();
             _canvasManager.ShowPanel(7, () =>
             {
                 if (_countdownRoutine != null)
