@@ -29,6 +29,13 @@ namespace WalkingTest
             }
         }
 
+        public void ResetVisualValue()
+        {
+            _textTimer.text = $"00:00";
+            _textSpeed.text = $"0.00 m/menit";
+            _textDistance.text = $"0,00m";
+        }
+
         public void SetTime(float remainingTime, float totalDuration)
         {
             if (_progressBar == null || totalDuration <= 0f)
@@ -55,17 +62,9 @@ namespace WalkingTest
             _textTimer.text = $"{m:00}:{s:00}";
         }
 
-        public void SetSpeedPerMin(float totalDistance, float totalWalkingTime)
+        public void SetAverageSpeedPerMin(float speedAverage)
         {
-            if (totalWalkingTime > 0f)
-            {
-                float speedMPerMin = totalDistance / totalWalkingTime * 60f;
-                _textSpeed.text = $"{speedMPerMin:F2} m/menit";
-            }
-            else
-            {
-                _textSpeed.text = $"Kecepatan: 0.00 m/menit";
-            }
+            _textSpeed.text = $"{speedAverage:F0} m/menit";
         }
 
         public void SetDinstance(float totalDistance)

@@ -65,7 +65,10 @@ namespace WalkingTest
 
         private float _duration;
         private float _remainingTime;
-        // private bool _isRunning;
+        // waktu yang sudah lewat (detik)
+        public float ElapsedTime { get; private set; }
+        public float Duration => _duration;
+
         private bool _isPaused;
         private Coroutine _loop;
         private int _lastWholeSecond;
@@ -85,6 +88,7 @@ namespace WalkingTest
             ResetStar();
             _boxItem.SetActive(false);
             ResetScore();
+            _smartwatch.ResetVisualValue();
 
             _wayPointGenerator.SpawnGamificationArena();
             _canvasManager.ShowPanel(5, () =>
@@ -101,12 +105,13 @@ namespace WalkingTest
 
                 _countdownRoutine = StartCoroutine(CountdownRoutine(() =>
                 {
+                    _distanceTracker.StartTracking();
+
+                    // ssetup object score
                     foreach (var obj in _itemObjectList)
                     {
                         obj.gameObject.SetActive(true);
                     }
-
-                    _distanceTracker.StartTracking();
 
                     //! hitung apakah player sudah melewati 1 putaran
                     _wayPointGenerator.onReachingLap.RemoveAllListeners();
@@ -148,6 +153,8 @@ namespace WalkingTest
             ResetScore();
             ResetStar();
             _boxItem.SetActive(true);
+
+            _smartwatch.ResetVisualValue();
 
             _wayPointGenerator.SpawnGamificationArena();
             _canvasManager.ShowPanel(7, () =>
@@ -205,6 +212,8 @@ namespace WalkingTest
             });
         }
 
+
+        #region User Data Handler
         private void StoreTestResult()
         {
             _applicationManager.StoreTestResultData(_2MWTData, _6MWTData);
@@ -215,6 +224,13 @@ namespace WalkingTest
             _distanceTracker.GetResult((x) => _2MWTData.totalDistance = x, (x) => _2MWTData.correctWay = x, (x) => _2MWTData.wrongWay = x);
             _2MWTData.totalLaps = _wayPointGenerator.lapsCompleted;
         }
+
+        private float CountAvarageSpeedPerMin(float totalDistance, float totalWalkingTimeSeconds)
+        {
+            if (totalWalkingTimeSeconds <= 0.0001f) return 0f;
+            return (totalDistance / totalWalkingTimeSeconds) * 60f;
+        }
+        #endregion
 
         #region Timer & Countdown
         private IEnumerator CountdownRoutine(Action onFinished)
@@ -248,8 +264,9 @@ namespace WalkingTest
             if (_remainingTime <= 0f)
                 _remainingTime = _duration;
 
+            ElapsedTime = Mathf.Clamp(_duration - _remainingTime, 0f, _duration); // reset sesuai kondisi
+
             _isPaused = false;
-            // _isRunning = true;
             _lastWholeSecond = Mathf.CeilToInt(_remainingTime);
 
             onTimerCompleted = null;
@@ -278,6 +295,8 @@ namespace WalkingTest
                 _remainingTime -= Time.deltaTime;
                 if (_remainingTime < 0f) _remainingTime = 0f;
 
+                ElapsedTime = Mathf.Clamp(_duration - _remainingTime, 0f, _duration);
+
                 TryFireThresholdEvents();
 
                 int currentWhole = Mathf.CeilToInt(_remainingTime);
@@ -287,7 +306,11 @@ namespace WalkingTest
                     // onTickEachSecond?.Invoke(); // ! fungsi yang dipanggil tiap detik
                 }
 
-                _smartwatch.SetTime(_remainingTime, _duration);
+                _smartwatch.SetTime(_remainingTime, _duration); // fungsi yang akan menampilkan durasi waktu yang tersisah
+
+                float currentDistance = _distanceTracker.GetCurrectDistance;
+                _smartwatch.SetDinstance(currentDistance);
+                _smartwatch.SetAverageSpeedPerMin(CountAvarageSpeedPerMin(currentDistance, ElapsedTime));
 
                 yield return null;
             }
@@ -343,7 +366,8 @@ namespace WalkingTest
         {
             StopLoop();
             _remainingTime = _duration;
-            // _isRunning = false;
+            ElapsedTime = 0f;
+
             _isPaused = false;
             ResetThresholdFlags();
             _lastWholeSecond = Mathf.CeilToInt(_remainingTime);

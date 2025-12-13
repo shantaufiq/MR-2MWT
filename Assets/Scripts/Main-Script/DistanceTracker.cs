@@ -1,5 +1,8 @@
 using System;
+using System.Runtime.CompilerServices;
+using UnityEditor.Rendering;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class DistanceTracker : MonoBehaviour
 {
@@ -7,6 +10,12 @@ public class DistanceTracker : MonoBehaviour
     [SerializeField] private float _totalDistance = 0f;
     [SerializeField] private float _correctDistance = 0f;
     [SerializeField] private float _wrongDistance = 0f;
+
+    public float GetCurrectDistance
+    {
+        get { return _totalDistance; }
+        private set { _correctDistance = value; }
+    }
 
     [Header("Configuration")]
     [SerializeField] private LayerMask _greenMask;

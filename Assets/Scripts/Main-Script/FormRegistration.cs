@@ -47,7 +47,7 @@ namespace WalkingTest
 
             // Validasi usia
             int ageValue;
-            if (!int.TryParse(ageStr, out ageValue) || ageValue <= 5)
+            if (!int.TryParse(ageStr, out ageValue) || ageValue <= 4)
             {
                 errorMsg += "Usia harus berupa angka dan lebih besar dari 5 tahun.\n ";
             }
