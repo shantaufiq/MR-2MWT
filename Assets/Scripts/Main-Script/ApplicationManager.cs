@@ -47,6 +47,7 @@ namespace WalkingTest
         [Header("Component References")]
         [SerializeField] private CanvasManager _canvasManager;
         [SerializeField] private WalkTestManager _walkTestManager;
+        [SerializeField] private WorldCanvasFollower _canvasFollowingPlayer;
 
         private void Start()
         {
@@ -64,6 +65,7 @@ namespace WalkingTest
             switch (_currentAppState)
             {
                 case AppState.Startup:
+                    _canvasFollowingPlayer.ShowCanvas();
                     _canvasManager.ShowPanel(0, () =>
                     {
                         NextStage();
@@ -88,10 +90,10 @@ namespace WalkingTest
                     _canvasManager.ShowPanel(4, () => NextStage());
                     break;
                 case AppState.Trial:
-                    _walkTestManager.StartTrialTest();
+                    _walkTestManager.StartTrialTest(() => _canvasFollowingPlayer.HideCanvas());
                     break;
                 case AppState.MainTest:
-                    _walkTestManager.StartMainTest();
+                    _walkTestManager.StartMainTest(() => _canvasFollowingPlayer.HideCanvas());
                     break;
                 case AppState.Result:
                     SFXManager.Main.PlayFromSFXObjectLibrary("9hasiltest");

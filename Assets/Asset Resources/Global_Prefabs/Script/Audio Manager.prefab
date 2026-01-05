@@ -1,0 +1,82 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &323050710054817150
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1542751186235404881}
+  - component: {fileID: 7627563151755249342}
+  - component: {fileID: 8079746021479018333}
+  m_Layer: 0
+  m_Name: Audio Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1542751186235404881
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 323050710054817150}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7627563151755249342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 323050710054817150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c714dff07c3144d2ba31f5d5947a7013, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Mixer: {fileID: 0}
+  ScenePersistent: 1
+  CollapseLibrary: 1
+  TrackLibrary:
+  - {fileID: 11400000, guid: 121d2574b9bc0b94b95d21c9951267d0, type: 2}
+--- !u!114 &8079746021479018333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 323050710054817150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ba875997bc5c4d85a9b0478acbccfc7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Mixer: {fileID: 0}
+  ScenePersistent: 1
+  CollapseObjectLibrary: 1
+  CollapseGroupLibrary: 1
+  SFXObjectLibrary:
+  - {fileID: 11400000, guid: 157b2c8aaafc98d44af8108d69d8b79b, type: 2}
+  - {fileID: 11400000, guid: 1fca58912da3bb34c97e7b1d8a8c1261, type: 2}
+  - {fileID: 11400000, guid: 4a6a1cdb0241e554d801f6f208d21e4b, type: 2}
+  - {fileID: 11400000, guid: 93b7bf84f32acce489cd30a0ea58ada5, type: 2}
+  - {fileID: 11400000, guid: c6fa5ca0c8a836b4ba4ab83ac28fe66e, type: 2}
+  - {fileID: 11400000, guid: 429b9d16a24ddde4e937abf464e7303a, type: 2}
+  - {fileID: 11400000, guid: 57ef5085db9a24c459d7c17f1a1c2b18, type: 2}
+  - {fileID: 11400000, guid: ffcd8766db4e70644b7de4647a2ae07f, type: 2}
+  - {fileID: 11400000, guid: e3838cc4941438f40962fa2fa64319b0, type: 2}
+  - {fileID: 11400000, guid: d2331d1633f5acb4cb7c765ebc4cf431, type: 2}
+  - {fileID: 11400000, guid: ed7e2efcc13eb28429f7a5d723e0b302, type: 2}
+  - {fileID: 11400000, guid: d0f98c96f1806964cad9632903087252, type: 2}
+  SFXGroupLibrary: []

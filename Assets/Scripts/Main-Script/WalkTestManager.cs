@@ -80,7 +80,7 @@ namespace WalkingTest
         [SerializeField] private Smartwatch _smartwatch;
         [SerializeField] private DistanceTracker _distanceTracker; // akan diganti denga vr distance tracker
 
-        public void StartTrialTest()
+        public void StartTrialTest(Action onHideCanvas)
         {
             SFXManager.Main.StopAll();
             SFXManager.Main.PlayFromSFXObjectLibrary("5trialintro");
@@ -90,7 +90,7 @@ namespace WalkingTest
             ResetScore();
             _smartwatch.ResetVisualValue();
 
-            _wayPointGenerator.SpawnGamificationArena();
+            //! _wayPointGenerator.SpawnGamificationArena();
             _canvasManager.ShowPanel(5, () =>
             {
                 if (_countdownRoutine != null)
@@ -107,6 +107,8 @@ namespace WalkingTest
                 {
                     _distanceTracker.StartTracking();
 
+                    onHideCanvas?.Invoke();
+
                     // ssetup object score
                     foreach (var obj in _itemObjectList)
                     {
@@ -114,7 +116,7 @@ namespace WalkingTest
                     }
 
                     //! hitung apakah player sudah melewati 1 putaran
-                    _wayPointGenerator.onReachingLap.RemoveAllListeners();
+                    /* _wayPointGenerator.onReachingLap.RemoveAllListeners();
                     _wayPointGenerator.onReachingLap.AddListener((int n) =>
                     {
                         if (n == 1)
@@ -127,7 +129,7 @@ namespace WalkingTest
                             });
                             SFXManager.Main.PlayFromSFXObjectLibrary("6trialsuccess");
                         }
-                    });
+                    }); */
 
                     _canvasManager.SetActiveCountDown(false, $"", "");
                     StartTimer(() =>
@@ -143,7 +145,7 @@ namespace WalkingTest
             });
         }
 
-        public void StartMainTest()
+        public void StartMainTest(Action onHideCanvas)
         {
             //! check apakah player sudah di titik start atau belum
 
@@ -156,7 +158,7 @@ namespace WalkingTest
 
             _smartwatch.ResetVisualValue();
 
-            _wayPointGenerator.SpawnGamificationArena();
+            //! _wayPointGenerator.SpawnGamificationArena();
             _canvasManager.ShowPanel(7, () =>
             {
                 if (_countdownRoutine != null)
@@ -171,14 +173,16 @@ namespace WalkingTest
 
                 _countdownRoutine = StartCoroutine(CountdownRoutine(() =>
                 {
-                    _wayPointGenerator.onReachingLap.RemoveAllListeners();
+                    onHideCanvas?.Invoke();
+
+                    /* _wayPointGenerator.onReachingLap.RemoveAllListeners();
                     _wayPointGenerator.onReachingLap.AddListener((int n) =>
                     {
                         foreach (var obj in _itemObjectList)
                         {
                             obj.gameObject.SetActive(true);
                         }
-                    });
+                    }); */
 
                     foreach (var obj in _itemObjectList)
                     {

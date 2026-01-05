@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using UnityEngine.Events;
-using System.Linq;
+using Meta.XR.MRUtilityKit;
 
 namespace WalkingTest
 {
@@ -18,6 +18,10 @@ namespace WalkingTest
         [SerializeField] private TrackOrientation orientation = TrackOrientation.PlusX;
         [SerializeField] private bool matchClockwiseToOrientation = true;
 
+        [SerializeField] private FloorAnchorSpawner floorSpawner;
+        [SerializeField] private Transform centerEyeAnchor;
+
+        [SerializeField] private Button setToCurrentAreaBtn;
         [SerializeField] private Button prevBtn;
         [SerializeField] private Button nextBtn;
         [SerializeField] private UIToggleButtonsGroup _toggleRotation;
@@ -57,7 +61,8 @@ namespace WalkingTest
         // ---------- GAMIFICATION ARENA ----------
         [Header("Gamification Arena")]
         [SerializeField] private List<PositionIdentity> _positionIdentity;
-        [SerializeField] private Transform _gamificationArena;
+        // [SerializeField] private Transform _gamificationArena;
+        [SerializeField] private FloorAnchorSpawner _gamificationArena;
         [Serializable]
         public struct PositionIdentity
         {
@@ -115,9 +120,24 @@ namespace WalkingTest
             tOrientationIndex = Array.IndexOf(tOrientationValues, orientation);
             if (tOrientationIndex < 0) tOrientationIndex = 0;
 
-            if (prevBtn) prevBtn.onClick.AddListener(Prev);
-            if (nextBtn) nextBtn.onClick.AddListener(Next);
+            if (setToCurrentAreaBtn) setToCurrentAreaBtn.onClick.AddListener(SpawnFloorAtPlayer);
+            // if (prevBtn) prevBtn.onClick.AddListener(Prev);
+            if (prevBtn) prevBtn.onClick.AddListener(() =>
+            {
+                floorSpawner.RotateFloorAroundNormal(-20);
+            });
+            // if (nextBtn) nextBtn.onClick.AddListener(Next);
+            if (nextBtn) nextBtn.onClick.AddListener(() =>
+            {
+                floorSpawner.RotateFloorAroundNormal(+20);
+            });
             if (_toggleRotation) _toggleRotation.onToggleChanged.AddListener(UpdateRotation);
+        }
+
+        public void SpawnFloorAtPlayer()
+        {
+            floorSpawner.SetPlacementFromPlayerPosition(centerEyeAnchor);
+            floorSpawner.SpawnNowCurrentRoom();
         }
 
 
@@ -127,9 +147,9 @@ namespace WalkingTest
             Vector3 ORI = new Vector3(player.position.x, 0f, player.position.z);
             ORI += offset.position;
 
-            _gamificationArena.gameObject.SetActive(true);
-            _gamificationArena.position = ORI;
-            _gamificationArena.rotation = Quaternion.Euler(0f, offset.rotation, 0f);
+            // _gamificationArena.gameObject.SetActive(true);
+            // _gamificationArena.position = ORI;
+            // _gamificationArena.rotation = Quaternion.Euler(0f, offset.rotation, 0f);
 
             RegenerateAll();
         }

@@ -1,0 +1,453 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5848441720544101787
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1860919358244445757}
+  - component: {fileID: 7516113878477696655}
+  m_Layer: 0
+  m_Name: Walk Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1860919358244445757
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5848441720544101787}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7516113878477696655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5848441720544101787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ebc0513891240c4a85246063641687d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _2MWTData:
+    totalDistance: 0
+    correctWay: 0
+    wrongWay: 0
+    walkingSpeed: 0
+    totalLaps: 0
+    stepsCount: 0
+  _6MWTData:
+    totalDistance: 0
+    correctWay: 0
+    wrongWay: 0
+    walkingSpeed: 0
+    totalLaps: 0
+    stepsCount: 0
+  _collectedItemCount: 0
+  _itemObjectList:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  _boxItem: {fileID: 0}
+  _scoreText: {fileID: 0}
+  _starList:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  _yellowMaterial: {fileID: 2100000, guid: aed2b2050c7851c4fa06b7594b8e3bd5, type: 2}
+  _greyMaterial: {fileID: 2100000, guid: ea372e58b5bd5d748b7dfe6dfa2878aa, type: 2}
+  _testDuration: 360
+  _countdownAudio: {fileID: 11400000, guid: e01d32e11fb65814e8fb59c9cc008e7c, type: 2}
+  _trialInstruction:
+  - name: berjalan ke depan
+    type: 2
+    textInformation: Berjalan ke depan, mengikuti panah lintasan
+    audioClip: {fileID: 11400000, guid: ef5986647adf4544cab2a5858ad1896a, type: 2}
+    icon: {fileID: 21300000, guid: 881dd3abfd1d1ad4badf29e6cb6b8c54, type: 3}
+    thresholdSeconds: 358
+    delayTimeToHide: 5
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls: []
+    _fired: 0
+  - name: lihat jam
+    type: 2
+    textInformation: Kamu bisa melihat sisa waktu melalu jam yang ada di tanganmu
+    audioClip: {fileID: 11400000, guid: bf8855a917af11144aa13063b17123b7, type: 2}
+    icon: {fileID: 21300000, guid: 3b9c4e84dac30a34cb80ef285dd3149c, type: 3}
+    thresholdSeconds: 350
+    delayTimeToHide: 5
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls: []
+    _fired: 0
+  - name: putar balik
+    type: 2
+    textInformation: Putar balik di ujung lintasan!
+    audioClip: {fileID: 11400000, guid: 77d4d55254ca45246a9ead8326b0b97e, type: 2}
+    icon: {fileID: 21300000, guid: 881dd3abfd1d1ad4badf29e6cb6b8c54, type: 3}
+    thresholdSeconds: 340
+    delayTimeToHide: 5
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls: []
+    _fired: 0
+  - name: countdown
+    type: 0
+    textInformation: 
+    audioClip: {fileID: 11400000, guid: f7bc75813a0c40846bf06af845961297, type: 2}
+    icon: {fileID: 0}
+    thresholdSeconds: 8
+    delayTimeToHide: 0.8
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls: []
+    _fired: 0
+  - name: countdown 5
+    type: 1
+    textInformation: 5
+    audioClip: {fileID: 0}
+    icon: {fileID: 0}
+    thresholdSeconds: 5
+    delayTimeToHide: 0.8
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls: []
+    _fired: 0
+  - name: countdown 4
+    type: 1
+    textInformation: 4
+    audioClip: {fileID: 0}
+    icon: {fileID: 0}
+    thresholdSeconds: 4
+    delayTimeToHide: 0.8
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls: []
+    _fired: 0
+  - name: countdown 3
+    type: 1
+    textInformation: 3
+    audioClip: {fileID: 0}
+    icon: {fileID: 0}
+    thresholdSeconds: 3
+    delayTimeToHide: 0.8
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls: []
+    _fired: 0
+  - name: countdown 2
+    type: 1
+    textInformation: 2
+    audioClip: {fileID: 0}
+    icon: {fileID: 0}
+    thresholdSeconds: 2
+    delayTimeToHide: 0.8
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls: []
+    _fired: 0
+  - name: countdown 1
+    type: 1
+    textInformation: 1
+    audioClip: {fileID: 0}
+    icon: {fileID: 0}
+    thresholdSeconds: 1
+    delayTimeToHide: 0.8
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls: []
+    _fired: 0
+  _mainTestInstruction:
+  - name: berjalan ke depan
+    type: 2
+    textInformation: Jalan pelan ke depan dan Ikuti panah biru !
+    audioClip: {fileID: 11400000, guid: bded830aa6b4ede42a604b62b5fe82bb, type: 2}
+    icon: {fileID: 21300000, guid: 881dd3abfd1d1ad4badf29e6cb6b8c54, type: 3}
+    thresholdSeconds: 358
+    delayTimeToHide: 5
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls: []
+    _fired: 0
+  - name: 5 menit
+    type: 2
+    textInformation: Waktu tersisa 5 menit
+    audioClip: {fileID: 11400000, guid: 5f27cd1a5e1f6ba4bbbfc267b5fb4c15, type: 2}
+    icon: {fileID: 21300000, guid: 3b9c4e84dac30a34cb80ef285dd3149c, type: 3}
+    thresholdSeconds: 300
+    delayTimeToHide: 5
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 7516113878477696655}
+          m_TargetAssemblyTypeName: WalkingTest.WalkTestManager, Assembly-CSharp
+          m_MethodName: ShowStar
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_MethodName: SetActive
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
+    _fired: 0
+  - name: 4 menit
+    type: 2
+    textInformation: Waktu tersisa 4 menit
+    audioClip: {fileID: 11400000, guid: 0f1091cc30527004c9f421d97ac61488, type: 2}
+    icon: {fileID: 21300000, guid: 707a04d8197dc1a479ba115531236534, type: 3}
+    thresholdSeconds: 240
+    delayTimeToHide: 5
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 7516113878477696655}
+          m_TargetAssemblyTypeName: WalkingTest.WalkTestManager, Assembly-CSharp
+          m_MethodName: GetData2MWT
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 7516113878477696655}
+          m_TargetAssemblyTypeName: WalkingTest.WalkTestManager, Assembly-CSharp
+          m_MethodName: ShowStar
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 1
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_MethodName: SetActive
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
+    _fired: 0
+  - name: 3 Menit
+    type: 2
+    textInformation: Waktu tersisa 3 menit
+    audioClip: {fileID: 11400000, guid: d866793a36eef4748953518d2a667061, type: 2}
+    icon: {fileID: 21300000, guid: 1ce21993c341d054c9f4709ae53d5a51, type: 3}
+    thresholdSeconds: 180
+    delayTimeToHide: 5
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 7516113878477696655}
+          m_TargetAssemblyTypeName: WalkingTest.WalkTestManager, Assembly-CSharp
+          m_MethodName: ShowStar
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 2
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_MethodName: SetActive
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
+    _fired: 0
+  - name: 2 Menit
+    type: 2
+    textInformation: Waktu tersisa 2 menit
+    audioClip: {fileID: 11400000, guid: 188e8eb58bb79384b87ea781bab91b03, type: 2}
+    icon: {fileID: 21300000, guid: d3983cb07b45a4448b02ea5e63a61dd0, type: 3}
+    thresholdSeconds: 120
+    delayTimeToHide: 5
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 7516113878477696655}
+          m_TargetAssemblyTypeName: WalkingTest.WalkTestManager, Assembly-CSharp
+          m_MethodName: ShowStar
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 3
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_MethodName: SetActive
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
+    _fired: 0
+  - name: 1 menit
+    type: 2
+    textInformation: 1 menit terakhir
+    audioClip: {fileID: 11400000, guid: c2b8bd3a4979b5b4b98015f1dbd7dd6c, type: 2}
+    icon: {fileID: 21300000, guid: 22b0e10219c02e240bbe949b6d8228b2, type: 3}
+    thresholdSeconds: 60
+    delayTimeToHide: 5
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 7516113878477696655}
+          m_TargetAssemblyTypeName: WalkingTest.WalkTestManager, Assembly-CSharp
+          m_MethodName: ShowStar
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 4
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    _fired: 0
+  - name: 20 detik
+    type: 2
+    textInformation: 20 detik terakhir
+    audioClip: {fileID: 11400000, guid: ac3aa748d1bc71443b97c8bbb8585846, type: 2}
+    icon: {fileID: 21300000, guid: 6c63be20f1eaba646824fc25163719de, type: 3}
+    thresholdSeconds: 20
+    delayTimeToHide: 5
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls: []
+    _fired: 0
+  - name: countdown
+    type: 0
+    textInformation: 
+    audioClip: {fileID: 11400000, guid: f7bc75813a0c40846bf06af845961297, type: 2}
+    icon: {fileID: 21300000, guid: 881dd3abfd1d1ad4badf29e6cb6b8c54, type: 3}
+    thresholdSeconds: 8
+    delayTimeToHide: 0.8
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls: []
+    _fired: 0
+  - name: countdown 5
+    type: 1
+    textInformation: 5
+    audioClip: {fileID: 0}
+    icon: {fileID: 0}
+    thresholdSeconds: 5
+    delayTimeToHide: 0.8
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls: []
+    _fired: 0
+  - name: countdown 4
+    type: 1
+    textInformation: 4
+    audioClip: {fileID: 0}
+    icon: {fileID: 0}
+    thresholdSeconds: 4
+    delayTimeToHide: 0.8
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls: []
+    _fired: 0
+  - name: countdown 3
+    type: 1
+    textInformation: 3
+    audioClip: {fileID: 0}
+    icon: {fileID: 0}
+    thresholdSeconds: 3
+    delayTimeToHide: 0.8
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls: []
+    _fired: 0
+  - name: countdown 2
+    type: 1
+    textInformation: 2
+    audioClip: {fileID: 0}
+    icon: {fileID: 0}
+    thresholdSeconds: 2
+    delayTimeToHide: 0.8
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls: []
+    _fired: 0
+  - name: countdown 1
+    type: 1
+    textInformation: 1
+    audioClip: {fileID: 0}
+    icon: {fileID: 0}
+    thresholdSeconds: 1
+    delayTimeToHide: 0.8
+    onThreshold:
+      m_PersistentCalls:
+        m_Calls: []
+    _fired: 0
+  _applicationManager: {fileID: 0}
+  _canvasManager: {fileID: 0}
+  _wayPointGenerator: {fileID: 0}
+  _smartwatch: {fileID: 0}
+  _distanceTracker: {fileID: 0}
