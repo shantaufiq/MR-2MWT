@@ -14,12 +14,9 @@ namespace WalkingTest
         public enum TrackOrientation { PlusX, MinusX, PlusZ, MinusZ }
 
         [Header("Referensi & Orientasi")]
-        [SerializeField] private Transform player;
+        [SerializeField] private Transform centerEyeAnchor;
         [SerializeField] private TrackOrientation orientation = TrackOrientation.PlusX;
         [SerializeField] private bool matchClockwiseToOrientation = true;
-
-        [SerializeField] private FloorAnchorSpawner floorSpawner;
-        [SerializeField] private Transform centerEyeAnchor;
 
         [SerializeField] private Button setToCurrentAreaBtn;
         [SerializeField] private Button prevBtn;
@@ -54,17 +51,7 @@ namespace WalkingTest
 
         // ---------- GAMIFICATION ARENA ----------
         [Header("Gamification Arena")]
-        [SerializeField] private List<PositionIdentity> _positionIdentity;
-        // [SerializeField] private Transform _gamificationArena;
-        [SerializeField] private FloorAnchorSpawner _gamificationArena;
-        [Serializable]
-        public struct PositionIdentity
-        {
-            public TrackOrientation targetOrientation;
-            public bool isForClockWise;
-            public Vector3 position;
-            public float rotation;
-        }
+        [SerializeField] private FloorAnchorSpawner floorSpawner;
 
         // ---------- LAP COUNTER ----------
         [Header("Lap Counter - Checkpoint Settings")]
@@ -152,25 +139,6 @@ namespace WalkingTest
                 Debug.LogError("Main Object tidak ditemukan di prefab!");
                 return;
             }
-
-            RegenerateAll();
-        }
-
-        private Transform GetFloorRoot()
-        {
-            if (!floorSpawner) return null;
-            return floorSpawner.GetSpawnedFloorRoot();
-        }
-
-        public void SpawnGamificationArena()
-        {
-            PositionIdentity offset = _positionIdentity.Find((x) => x.targetOrientation == orientation && x.isForClockWise == clockwise);
-            Vector3 ORI = new Vector3(player.position.x, 0f, player.position.z);
-            ORI += offset.position;
-
-            // _gamificationArena.gameObject.SetActive(true);
-            // _gamificationArena.position = ORI;
-            // _gamificationArena.rotation = Quaternion.Euler(0f, offset.rotation, 0f);
 
             RegenerateAll();
         }
@@ -286,12 +254,6 @@ namespace WalkingTest
 
         private void Generate()
         {
-            if (!player)
-            {
-                Debug.LogWarning("Player belum di-assign ke TrackWaypointGenerator.");
-                return;
-            }
-
             pts.Clear();
 
             radius = Mathf.Max(0.01f, radius);

@@ -4808,6 +4808,11 @@ PrefabInstance:
       objectReference: {fileID: 1767634675}
     - target: {fileID: 1279936435802837023, guid: 9b1fd2b177dd01049bd278706961dd2d,
         type: 3}
+      propertyPath: ccwFloorRightOffset
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279936435802837023, guid: 9b1fd2b177dd01049bd278706961dd2d,
+        type: 3}
       propertyPath: setToCurrentAreaBtn
       value: 
       objectReference: {fileID: 1494484965}
@@ -7100,6 +7105,9 @@ MonoBehaviour:
   NormalOffsetMeters: 0
   FitToFloorPlaneRect: 0
   PrefabSizeXYMeters: {x: 1, y: 1}
+  onFloorTransformChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!23 &1467776406 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 859219026517753655, guid: 484a1ab646f27734891dcd615944d538,
