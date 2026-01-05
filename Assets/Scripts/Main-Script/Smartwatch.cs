@@ -32,7 +32,7 @@ namespace WalkingTest
         public void ResetVisualValue()
         {
             _textTimer.text = $"00:00";
-            _textSpeed.text = $"0.00 m/menit";
+            _textSpeed.text = $"0 m/min";
             _textDistance.text = $"0,00m";
         }
 
@@ -64,14 +64,15 @@ namespace WalkingTest
 
         public void SetAverageSpeedPerMin(float speedAverage)
         {
-            _textSpeed.text = $"{speedAverage:F0} m/menit";
+            _textSpeed.text = $"{speedAverage:F0} m/min";
         }
 
         public void SetDinstance(float totalDistance)
         {
             int meters = Mathf.FloorToInt(totalDistance);
             int centimeters = Mathf.FloorToInt((totalDistance - meters) * 100f);
-            _textDistance.text = $"{meters},{centimeters}m";
+            // _textDistance.text = $"{meters},{centimeters}m";
+            _textDistance.text = $"{totalDistance:0}m";
         }
 
         public void SetSmartwatchVisible(bool visible)

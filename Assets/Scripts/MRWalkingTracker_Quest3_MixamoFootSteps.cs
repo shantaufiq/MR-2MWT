@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System;
 
 /// <summary>
 /// Quest 3 / MR Walking Tracker
@@ -132,6 +133,13 @@ public class MRWalkingTracker_Quest3_MixamoFootSteps : MonoBehaviour
     public float CorrectDistance => correctDistance;
     public float WrongDistance => wrongDistance;
 
+    public void GetResult(Action<float> total, Action<float> correct, Action<float> wrong)
+    {
+        total?.Invoke(TotalDistance);
+        correct?.Invoke(CorrectDistance);
+        wrong?.Invoke(WrongDistance);
+    }
+
     public int TotalSteps => totalSteps;
     public int CorrectSteps => correctSteps;
     public int WrongSteps => wrongSteps;
@@ -183,7 +191,7 @@ public class MRWalkingTracker_Quest3_MixamoFootSteps : MonoBehaviour
 
     private void Start()
     {
-        StartTracking();
+        // StartTracking();
     }
 
     private void Update()

@@ -39,7 +39,7 @@ namespace Meta.XR.MRUtilityKit
         #region Unity Lifecycle
         private void Start()
         {
-            if (!MRUK.Instance || SpawnOnSceneLoaded == MRUK.RoomFilter.None)
+            /* if (!MRUK.Instance || SpawnOnSceneLoaded == MRUK.RoomFilter.None)
                 return;
 
             MRUK.Instance.RegisterSceneLoadedCallback(() =>
@@ -47,7 +47,7 @@ namespace Meta.XR.MRUtilityKit
                 var room = MRUK.Instance.GetCurrentRoom();
                 if (room)
                     SpawnOrMoveOnRoomFloor(room);
-            });
+            }); */
         }
         #endregion
 

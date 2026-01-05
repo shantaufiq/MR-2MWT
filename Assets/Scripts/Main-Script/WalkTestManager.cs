@@ -15,13 +15,13 @@ namespace WalkingTest
         [SerializeField] private TestResultData _6MWTData = new();
 
         [Header("Score Item & Star Badge")]
-        [SerializeField] private int _collectedItemCount = 0;
+        /* [SerializeField] private int _collectedItemCount = 0;
         [SerializeField] private List<ItemObject> _itemObjectList;
         [SerializeField] private GameObject _boxItem;
         [SerializeField] private TextMeshPro _scoreText;
         [SerializeField] private List<MeshRenderer> _starList;
         [SerializeField] private Material _yellowMaterial;
-        [SerializeField] private Material _greyMaterial;
+        [SerializeField] private Material _greyMaterial; */
 
         [Header("Component | Countdown & Timer")]
         [SerializeField] private float _testDuration = 360f;
@@ -78,16 +78,18 @@ namespace WalkingTest
         [SerializeField] private CanvasManager _canvasManager;
         [SerializeField] private TrackWaypointGenerator _wayPointGenerator;
         [SerializeField] private Smartwatch _smartwatch;
-        [SerializeField] private DistanceTracker _distanceTracker; // akan diganti denga vr distance tracker
+        // [SerializeField] private DistanceTracker _distanceTracker; // akan diganti denga vr distance tracker
+        [SerializeField] private MRWalkingTracker_Quest3_MixamoFootSteps _MRDistanceTracker; // akan diganti denga vr distance tracker
 
         public void StartTrialTest(Action onHideCanvas)
         {
             SFXManager.Main.StopAll();
             SFXManager.Main.PlayFromSFXObjectLibrary("5trialintro");
 
-            ResetStar();
+            /* ResetStar();
             _boxItem.SetActive(false);
-            ResetScore();
+            ResetScore(); */
+
             _smartwatch.ResetVisualValue();
 
             //! _wayPointGenerator.SpawnGamificationArena();
@@ -105,15 +107,15 @@ namespace WalkingTest
 
                 _countdownRoutine = StartCoroutine(CountdownRoutine(() =>
                 {
-                    _distanceTracker.StartTracking();
+                    _MRDistanceTracker.StartTracking();
 
                     onHideCanvas?.Invoke();
 
                     // ssetup object score
-                    foreach (var obj in _itemObjectList)
+                    /* foreach (var obj in _itemObjectList)
                     {
                         obj.gameObject.SetActive(true);
-                    }
+                    } */
 
                     //! hitung apakah player sudah melewati 1 putaran
                     /* _wayPointGenerator.onReachingLap.RemoveAllListeners();
@@ -152,9 +154,9 @@ namespace WalkingTest
             SFXManager.Main.StopAll();
             SFXManager.Main.PlayFromSFXObjectLibrary("7testintro");
 
-            ResetScore();
+            /* ResetScore();
             ResetStar();
-            _boxItem.SetActive(true);
+            _boxItem.SetActive(true); */
 
             _smartwatch.ResetVisualValue();
 
@@ -184,17 +186,17 @@ namespace WalkingTest
                         }
                     }); */
 
-                    foreach (var obj in _itemObjectList)
+                    /* foreach (var obj in _itemObjectList)
                     {
                         obj.gameObject.SetActive(true);
-                    }
+                    } */
 
-                    _distanceTracker.StartTracking();
+                    _MRDistanceTracker.StartTracking();
                     _canvasManager.SetActiveCountDown(false, $"", "J");
                     StartTimer(() =>
                     {
-                        _distanceTracker.StopTracking();
-                        _distanceTracker.GetResult((x) => _6MWTData.totalDistance = x, (x) => _6MWTData.correctWay = x, (x) => _6MWTData.wrongWay = x);
+                        _MRDistanceTracker.StopTracking();
+                        _MRDistanceTracker.GetResult((x) => _6MWTData.totalDistance = x, (x) => _6MWTData.correctWay = x, (x) => _6MWTData.wrongWay = x);
                         _6MWTData.totalLaps = _wayPointGenerator.lapsCompleted;
 
                         SFXManager.Main.PlayFromSFXObjectLibrary("8testsuccess");
@@ -207,10 +209,10 @@ namespace WalkingTest
                             _applicationManager.NextStage();
                         });
 
-                        foreach (var obj in _itemObjectList)
+                        /* foreach (var obj in _itemObjectList)
                         {
                             obj.gameObject.SetActive(false);
-                        }
+                        } */
                     });
                 }));
             });
@@ -223,9 +225,9 @@ namespace WalkingTest
             _applicationManager.StoreTestResultData(_2MWTData, _6MWTData);
         }
 
-        public void GetData2MWT()
+        public void GetData2MWT() // call from event inspector
         {
-            _distanceTracker.GetResult((x) => _2MWTData.totalDistance = x, (x) => _2MWTData.correctWay = x, (x) => _2MWTData.wrongWay = x);
+            _MRDistanceTracker.GetResult((x) => _2MWTData.totalDistance = x, (x) => _2MWTData.correctWay = x, (x) => _2MWTData.wrongWay = x);
             _2MWTData.totalLaps = _wayPointGenerator.lapsCompleted;
         }
 
@@ -312,7 +314,7 @@ namespace WalkingTest
 
                 _smartwatch.SetTime(_remainingTime, _duration); // fungsi yang akan menampilkan durasi waktu yang tersisah
 
-                float currentDistance = _distanceTracker.GetCurrectDistance;
+                float currentDistance = _MRDistanceTracker.TotalDistance;
                 _smartwatch.SetDinstance(currentDistance);
                 _smartwatch.SetAverageSpeedPerMin(CountAvarageSpeedPerMin(currentDistance, ElapsedTime));
 
@@ -388,7 +390,7 @@ namespace WalkingTest
         #endregion
 
         #region Score & Star badge
-        public void AddScore(int newPoint)
+        /* public void AddScore(int newPoint)
         {
             _collectedItemCount += newPoint;
             _scoreText.text = $"{_collectedItemCount}";
@@ -423,7 +425,7 @@ namespace WalkingTest
             {
                 star.material = _greyMaterial;
             }
-        }
+        } */
         #endregion
     }
 }

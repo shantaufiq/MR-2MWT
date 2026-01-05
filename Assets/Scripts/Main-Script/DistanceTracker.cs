@@ -1,8 +1,5 @@
 using System;
-using System.Runtime.CompilerServices;
-using UnityEditor.Rendering;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class DistanceTracker : MonoBehaviour
 {

@@ -30,7 +30,7 @@ namespace WalkingTest
         {
             m_isTracking = true;
 
-            Invoke(nameof(IsTrackingFalse), 1f);
+            Invoke(nameof(IsTrackingFalse), 5f);
         }
 
         private void IsTrackingFalse()
