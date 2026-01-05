@@ -4779,7 +4779,7 @@ PrefabInstance:
     - target: {fileID: 1279936435802837023, guid: 9b1fd2b177dd01049bd278706961dd2d,
         type: 3}
       propertyPath: trackY
-      value: -0.7
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 1279936435802837023, guid: 9b1fd2b177dd01049bd278706961dd2d,
         type: 3}

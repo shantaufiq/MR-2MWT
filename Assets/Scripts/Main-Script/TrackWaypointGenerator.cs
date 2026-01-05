@@ -41,12 +41,6 @@ namespace WalkingTest
         [Header("Penempatan")]
         [SerializeField] private float trackY = 0f;
 
-        // ---------- CONES ----------
-        [Header("Cone Settings")]
-        [SerializeField] private GameObject conePrefab;
-        [SerializeField] private float coneOffsetFromTurn = 0.3f;
-        [SerializeField] private float coneY = 0.245f;
-
         [HideInInspector] public GameObject coneLeftInstance;
         [HideInInspector] public GameObject coneRightInstance;
 
@@ -124,22 +118,49 @@ namespace WalkingTest
             // if (prevBtn) prevBtn.onClick.AddListener(Prev);
             if (prevBtn) prevBtn.onClick.AddListener(() =>
             {
-                floorSpawner.RotateFloorAroundNormal(-20);
+                floorSpawner.RotateFloorAroundNormal(-5);
             });
             // if (nextBtn) nextBtn.onClick.AddListener(Next);
             if (nextBtn) nextBtn.onClick.AddListener(() =>
             {
-                floorSpawner.RotateFloorAroundNormal(+20);
+                floorSpawner.RotateFloorAroundNormal(+5);
             });
             if (_toggleRotation) _toggleRotation.onToggleChanged.AddListener(UpdateRotation);
+        }
+
+        private void OnEnable()
+        {
+            if (floorSpawner)
+                floorSpawner.onFloorTransformChanged.AddListener(RegenerateAll);
+        }
+
+        private void OnDisable()
+        {
+            if (floorSpawner)
+                floorSpawner.onFloorTransformChanged.RemoveListener(RegenerateAll);
         }
 
         public void SpawnFloorAtPlayer()
         {
             floorSpawner.SetPlacementFromPlayerPosition(centerEyeAnchor);
             floorSpawner.SpawnNowCurrentRoom();
+
+            // Ambil Main Object SETELAH spawn
+            Transform mainFloor = floorSpawner.GetFloorMainObject();
+            if (!mainFloor)
+            {
+                Debug.LogError("Main Object tidak ditemukan di prefab!");
+                return;
+            }
+
+            RegenerateAll();
         }
 
+        private Transform GetFloorRoot()
+        {
+            if (!floorSpawner) return null;
+            return floorSpawner.GetSpawnedFloorRoot();
+        }
 
         public void SpawnGamificationArena()
         {
@@ -237,17 +258,31 @@ namespace WalkingTest
         // ================= TRACK GENERATION =======================
         // =========================================================
 
-        void ResolveAxes(out Vector3 RIGHT, out Vector3 FWD)
+        void ResolveAxes(out Vector3 RIGHT, out Vector3 FWD, out Vector3 UP)
         {
-            switch (orientation)
+            Transform main = floorSpawner.GetFloorMainObject();
+            if (!main)
             {
-                case TrackOrientation.PlusX: RIGHT = Vector3.right; FWD = Vector3.forward; break;
-                case TrackOrientation.MinusX: RIGHT = Vector3.left; FWD = Vector3.forward; break;
-                case TrackOrientation.PlusZ: RIGHT = Vector3.forward; FWD = Vector3.right; break;
-                case TrackOrientation.MinusZ: RIGHT = Vector3.back; FWD = Vector3.right; break;
-                default: RIGHT = Vector3.right; FWD = Vector3.forward; break;
+                // fallback aman (editor/debug)
+                UP = Vector3.up;
+                FWD = Vector3.forward;
+                RIGHT = Vector3.right;
+                return;
             }
+
+            // 1️⃣ Normal lantai = UP dari Main Object
+            UP = main.up.normalized;
+
+            // 2️⃣ Arah lintasan = FORWARD dari Main Object
+            FWD = main.forward.normalized;
+
+            // 3️⃣ RIGHT = sumbu kanan di bidang lantai
+            RIGHT = Vector3.Cross(UP, FWD).normalized;
+
+            // 4️⃣ Re-orthogonalize (anti skew)
+            FWD = Vector3.Cross(RIGHT, UP).normalized;
         }
+
 
         private void Generate()
         {
@@ -264,9 +299,21 @@ namespace WalkingTest
             arcSegments = Mathf.Clamp(arcSegments, 8, 256);
             straightStep = Mathf.Max(0.05f, straightStep);
 
-            ResolveAxes(out Vector3 RIGHT, out Vector3 FWD);
-            Vector3 ORI = player.position;
-            Vector3 P(float lx, float lz) => ORI + RIGHT * lx + FWD * lz + Vector3.up * trackY;
+            ResolveAxes(out Vector3 RIGHT, out Vector3 FWD, out Vector3 UP);
+
+            Transform main = floorSpawner.GetFloorMainObject();
+            if (!main)
+            {
+                Debug.LogWarning("Main Object belum tersedia.");
+                return;
+            }
+
+            Vector3 ORI = main.position;
+
+            Vector3 P(float lx, float lz)
+            {
+                return ORI + RIGHT * lx + FWD * lz + UP * trackY;
+            }
 
             float L = straightLength;
             float R = radius;
@@ -331,48 +378,6 @@ namespace WalkingTest
             lr.positionCount = pts.Count;
             lr.SetPositions(pts.ToArray());
         }
-
-
-        // =========================================================
-        // ===================== CONE SPAWN =========================
-        // =========================================================
-
-        private void SpawnCones()
-        {
-            if (!conePrefab) return;
-
-            if (coneLeftInstance) Destroy(coneLeftInstance);
-            if (coneRightInstance) Destroy(coneRightInstance);
-
-            ResolveAxes(out Vector3 RIGHT, out Vector3 FWD);
-            Vector3 ORI = player ? player.position : transform.position;
-
-            float L = Mathf.Max(0.01f, straightLength);
-            float R = Mathf.Max(0.01f, radius);
-
-            float zBottom = 0f;
-            float zTop = clockwise ? -2f * R : 2f * R;
-            float zCenter = (zBottom + zTop) * .5f;
-
-            float xLeft = Mathf.Clamp(coneOffsetFromTurn, 0f, L);
-            float xRight = Mathf.Clamp(L - coneOffsetFromTurn, 0f, L);
-
-            Vector3 P(float lx, float lz) => ORI + RIGHT * lx + FWD * lz;
-
-            Vector3 leftPos = P(xLeft, zCenter);
-            leftPos.y = coneY;
-
-            Vector3 rightPos = P(xRight, zCenter);
-            rightPos.y = coneY;
-
-            coneLeftInstance = Instantiate(conePrefab, leftPos, Quaternion.identity);
-            coneRightInstance = Instantiate(conePrefab, rightPos, Quaternion.identity);
-
-            Quaternion look = Quaternion.LookRotation(RIGHT, Vector3.up);
-            coneLeftInstance.transform.rotation = look;
-            coneRightInstance.transform.rotation = look;
-        }
-
 
         // =========================================================
         // ==================== COLLIDER BUILDER ====================
@@ -566,7 +571,6 @@ namespace WalkingTest
             if (wasVisible)
             {
                 // jika sedang terlihat, rebuild semuanya
-                SpawnCones();
 
                 if (buildColliders)
                     BuildTrackColliders();

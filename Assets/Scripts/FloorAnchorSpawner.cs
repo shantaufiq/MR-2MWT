@@ -1,5 +1,6 @@
 using Meta.XR.Util;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Meta.XR.MRUtilityKit
 {
@@ -28,6 +29,9 @@ namespace Meta.XR.MRUtilityKit
         public bool FitToFloorPlaneRect = false;
         public Vector2 PrefabSizeXYMeters = new Vector2(1f, 1f);
 
+        [Header("Events")]
+        public UnityEvent onFloorTransformChanged;
+
         private GameObject _spawnedInstance;
         private Transform _cachedFloorAnchor;
         private MRUKRoom _cachedRoom;
@@ -40,193 +44,96 @@ namespace Meta.XR.MRUtilityKit
 
             MRUK.Instance.RegisterSceneLoadedCallback(() =>
             {
-                switch (SpawnOnSceneLoaded)
-                {
-                    case MRUK.RoomFilter.AllRooms:
-                        foreach (var room in MRUK.Instance.Rooms)
-                            SpawnOrMoveOnRoomFloor(room);
-                        break;
-
-                    case MRUK.RoomFilter.CurrentRoomOnly:
-                        SpawnOrMoveOnRoomFloor(MRUK.Instance.GetCurrentRoom());
-                        break;
-                }
+                var room = MRUK.Instance.GetCurrentRoom();
+                if (room)
+                    SpawnOrMoveOnRoomFloor(room);
             });
         }
         #endregion
 
         #region Public API
 
-        [ContextMenu("Spawn Floor Now (Current Room)")]
         public void SpawnNowCurrentRoom()
         {
             if (!MRUK.Instance) return;
             SpawnOrMoveOnRoomFloor(MRUK.Instance.GetCurrentRoom());
         }
 
-        /// <summary>
-        /// === FUNGSI UTAMA YANG ANDA MINTA ===
-        /// Mengatur agar lantai di-spawn tepat di posisi player saat ini (di lantai).
-        /// Biasanya dipanggil sebelum SpawnNowCurrentRoom().
-        /// </summary>
-        public void SetPlacementFromPlayerPosition(
-            Transform playerWorldTransform,
-            bool applyImmediately = true)
+        public void SetPlacementFromPlayerPosition(Transform playerWorldTransform)
         {
-            if (!playerWorldTransform)
-            {
-                Debug.LogWarning("[FloorAnchorSpawner] Player transform null.");
-                return;
-            }
+            if (!playerWorldTransform) return;
 
             CacheFloorAnchorIfNeeded();
             if (_cachedFloorAnchor == null) return;
 
-            Transform floorAnchor = _cachedFloorAnchor;
+            Vector3 playerPos = playerWorldTransform.position;
 
-            // Ambil posisi player (CenterEye)
-            Vector3 playerWorldPos = playerWorldTransform.position;
-
-            // Proyeksikan ke lantai
             Vector3 projectedWorldPos = new Vector3(
-                playerWorldPos.x,
-                0f,
-                floorAnchor.position.z
+                playerPos.x,
+                _cachedFloorAnchor.position.y,
+                playerPos.z
             );
 
-            // Simpan sebagai offset lokal terhadap FloorAnchor
             PositionOffsetSpace = OffsetSpace.AnchorLocal;
-            PositionOffset = floorAnchor.InverseTransformPoint(projectedWorldPos);
-
-            // Reset rotasi tambahan
+            PositionOffset = _cachedFloorAnchor.InverseTransformPoint(projectedWorldPos);
             RotationOffsetEuler = Vector3.zero;
-
-            if (!applyImmediately)
-                return;
-
-            var target = GetCurrentTargetTransform();
-            if (target != null)
-                ApplyPlacement(target, floorAnchor);
         }
 
-        /// <summary>
-        /// Memutar lantai di sekitar normal lantai (yaw).
-        /// </summary>
-        public void RotateFloorAroundNormal(float deltaDegrees, bool applyImmediately = true)
+        public void RotateFloorAroundNormal(float deltaDegrees)
         {
             CacheFloorAnchorIfNeeded();
             if (_cachedFloorAnchor == null) return;
 
             RotationOffsetEuler.z = Mathf.Repeat(RotationOffsetEuler.z + deltaDegrees, 360f);
 
-            if (!applyImmediately) return;
-
             var target = GetCurrentTargetTransform();
             if (target != null)
+            {
                 ApplyPlacement(target, _cachedFloorAnchor);
+                onFloorTransformChanged?.Invoke();
+            }
         }
 
         #endregion
 
-        #region Core Spawn Logic
+        #region Core Logic
 
         public void SpawnOrMoveOnRoomFloor(MRUKRoom room)
         {
-            if (!room || !room.FloorAnchor)
-            {
-                Debug.LogWarning("[FloorAnchorSpawner] Room or FloorAnchor invalid.");
-                return;
-            }
+            if (!room || !room.FloorAnchor) return;
 
             _cachedRoom = room;
             _cachedFloorAnchor = room.FloorAnchor.transform;
 
-            if (!FloorPrefabOrObject)
-            {
-                Debug.LogWarning("[FloorAnchorSpawner] FloorPrefabOrObject not assigned.");
-                return;
-            }
-
             GameObject targetGO;
 
-            bool isSceneObject = FloorPrefabOrObject.scene.IsValid();
-            if (isSceneObject)
+            if (FloorPrefabOrObject.scene.IsValid())
             {
                 targetGO = FloorPrefabOrObject;
             }
             else
             {
                 if (_spawnedInstance == null)
-                {
                     _spawnedInstance = Instantiate(FloorPrefabOrObject);
-                    _spawnedInstance.name = $"{FloorPrefabOrObject.name} (SpawnedOnFloor)";
-                }
+
                 targetGO = _spawnedInstance;
             }
 
             ApplyPlacement(targetGO.transform, _cachedFloorAnchor);
-
-            if (FitToFloorPlaneRect)
-                TryFitScaleToPlaneRect(targetGO.transform, _cachedFloorAnchor);
+            onFloorTransformChanged?.Invoke();
         }
 
         #endregion
 
-        #region Placement Helpers
+        #region Helpers
 
         private void ApplyPlacement(Transform target, Transform floorAnchor)
         {
             Quaternion rotOffset = Quaternion.Euler(RotationOffsetEuler);
 
-            if (ParentToFloorAnchor)
-            {
-                target.SetParent(floorAnchor, false);
-
-                Vector3 localOffset = PositionOffset;
-                if (PositionOffsetSpace == OffsetSpace.World)
-                    localOffset = Quaternion.Inverse(floorAnchor.rotation) * PositionOffset;
-
-                localOffset += Vector3.forward * NormalOffsetMeters;
-
-                target.localPosition = localOffset;
-                target.localRotation = rotOffset;
-            }
-            else
-            {
-                Vector3 basePos = floorAnchor.position;
-                Quaternion baseRot = floorAnchor.rotation;
-
-                Vector3 worldOffset =
-                    (PositionOffsetSpace == OffsetSpace.AnchorLocal)
-                        ? baseRot * PositionOffset
-                        : PositionOffset;
-
-                worldOffset += baseRot * Vector3.forward * NormalOffsetMeters;
-
-                target.position = basePos + worldOffset;
-                target.rotation = baseRot * rotOffset;
-            }
-        }
-
-        private void TryFitScaleToPlaneRect(Transform target, Transform floorAnchor)
-        {
-            var mrukAnchor = floorAnchor.GetComponent<MRUKAnchor>();
-            if (!mrukAnchor || !mrukAnchor.PlaneRect.HasValue) return;
-
-            var rect = mrukAnchor.PlaneRect.Value;
-
-            float sx = rect.size.x / Mathf.Max(0.0001f, PrefabSizeXYMeters.x);
-            float sy = rect.size.y / Mathf.Max(0.0001f, PrefabSizeXYMeters.y);
-
-            target.localScale = new Vector3(sx, sy, target.localScale.z);
-        }
-
-        private Transform GetCurrentTargetTransform()
-        {
-            if (!FloorPrefabOrObject) return null;
-            if (FloorPrefabOrObject.scene.IsValid()) return FloorPrefabOrObject.transform;
-            if (_spawnedInstance != null) return _spawnedInstance.transform;
-            return null;
+            target.SetParent(floorAnchor, false);
+            target.localPosition = PositionOffset + Vector3.forward * NormalOffsetMeters;
+            target.localRotation = rotOffset;
         }
 
         private void CacheFloorAnchorIfNeeded()
@@ -236,10 +143,26 @@ namespace Meta.XR.MRUtilityKit
 
             var room = MRUK.Instance.GetCurrentRoom();
             if (room && room.FloorAnchor)
-            {
-                _cachedRoom = room;
                 _cachedFloorAnchor = room.FloorAnchor.transform;
-            }
+        }
+
+        private Transform GetCurrentTargetTransform()
+        {
+            if (FloorPrefabOrObject.scene.IsValid())
+                return FloorPrefabOrObject.transform;
+
+            return _spawnedInstance ? _spawnedInstance.transform : null;
+        }
+
+        public Transform GetSpawnedFloorRoot()
+        {
+            return GetCurrentTargetTransform();
+        }
+
+        public Transform GetFloorMainObject()
+        {
+            var root = GetSpawnedFloorRoot();
+            return root ? root.Find("Main Object") : null;
         }
 
         #endregion
