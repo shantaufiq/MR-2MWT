@@ -7,7 +7,7 @@ namespace WalkingTest
     {
         public int pointValue = 10;
 
-        [SerializeField] private WalkTestManager _walkTestManager;
+        public WalkTestManager _walkTestManager;
 
         [Header("Tween Settings")]
         [SerializeField] private float floatHeight = 0.5f;
@@ -17,6 +17,14 @@ namespace WalkingTest
 
         private Tween _floatTween;
         private Tween _rotateTween;
+
+        private void Start()
+        {
+            if (_walkTestManager == null)
+            {
+                _walkTestManager = FindObjectOfType<WalkTestManager>();
+            }
+        }
 
         private void OnEnable()
         {
@@ -38,10 +46,10 @@ namespace WalkingTest
         {
             if (other.CompareTag("Player"))
             {
-                // _walkTestManager.AddScore(pointValue);
-                gameObject.SetActive(false);
-
+                _walkTestManager.AddScore(pointValue);
                 SFXManager.Main.PlayFromSFXObjectLibrary("score");
+
+                gameObject.SetActive(false);
             }
         }
 

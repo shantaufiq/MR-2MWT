@@ -28,4 +28,8 @@
   <uses-feature android:name="oculus.software.face_tracking" android:required="false" />
   <uses-permission android:name="com.oculus.permission.FACE_TRACKING" />
   <uses-permission android:name="android.permission.RECORD_AUDIO" />
+  <uses-feature android:name="oculus.software.overlay_keyboard" android:required="false" />
+  <uses-feature android:name="com.oculus.feature.RENDER_MODEL" />
+  <uses-permission android:name="com.oculus.permission.RENDER_MODEL" />
+  <uses-feature android:name="com.oculus.feature.BOUNDARYLESS_APP" android:required="true" />
 </manifest>
