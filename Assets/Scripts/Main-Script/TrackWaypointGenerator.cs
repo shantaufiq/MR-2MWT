@@ -129,6 +129,8 @@ namespace WalkingTest
             floorSpawner.SetPlacementFromPlayerPosition(centerEyeAnchor);
             floorSpawner.SpawnNowCurrentRoom();
 
+            lr.enabled = true;
+
             // Ambil Main Object SETELAH spawn
             Transform mainFloor = floorSpawner.GetFloorMainObject();
             if (!mainFloor)
@@ -549,14 +551,6 @@ namespace WalkingTest
         // ================= TRACK VISIBILITY API ===================
         // =========================================================
 
-        private void ShowTrack()
-        {
-            lr.enabled = true;
-            RegenerateAll();
-
-            Debug.Log("TRACK SHOWN");
-        }
-
         public void HideTrack()
         {
             lr.enabled = false;
@@ -565,12 +559,6 @@ namespace WalkingTest
             ResetLapState();
 
             Debug.Log("TRACK HIDDEN");
-        }
-
-        private void ToggleTrack(bool show)
-        {
-            if (show) ShowTrack();
-            else HideTrack();
         }
     }
 }

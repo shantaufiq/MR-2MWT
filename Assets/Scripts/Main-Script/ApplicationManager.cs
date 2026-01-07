@@ -87,6 +87,7 @@ namespace WalkingTest
                     // show validation mechanic in registration script
                     break;
                 case AppState.Settings:
+                    _walkTestManager.ShowTrack();
                     _canvasManager.ShowPanel(4, () => NextStage());
                     break;
                 case AppState.Trial:

@@ -97,6 +97,11 @@ namespace WalkingTest
         // [SerializeField] private DistanceTracker _distanceTracker; // akan diganti denga vr distance tracker
         [SerializeField] private MRWalkingTracker_Quest3_MixamoFootSteps _MRDistanceTracker; // akan diganti denga vr distance tracker
 
+        public void ShowTrack()
+        {
+            _wayPointGenerator.SpawnFloorAtPlayer();
+        }
+
         public void StartTrialTest(Action onHideCanvas)
         {
             SFXManager.Main.StopAll();
