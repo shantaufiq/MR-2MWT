@@ -38,9 +38,6 @@ namespace WalkingTest
         [Header("Penempatan")]
         [SerializeField] private float trackY = 0f;
 
-        [HideInInspector] public GameObject coneLeftInstance;
-        [HideInInspector] public GameObject coneRightInstance;
-
         // ---------- COLLIDERS ----------
         [Header("Track Colliders")]
         [SerializeField] private bool buildColliders = true;
@@ -541,9 +538,6 @@ namespace WalkingTest
             }
             else
             {
-                // kalau lagi disembunyikan, pastikan cones & colliders tidak aktif
-                if (coneLeftInstance) coneLeftInstance.SetActive(false);
-                if (coneRightInstance) coneRightInstance.SetActive(false);
                 ClearTrackColliders();
             }
 
@@ -566,9 +560,6 @@ namespace WalkingTest
         public void HideTrack()
         {
             lr.enabled = false;
-
-            if (coneLeftInstance) coneLeftInstance.SetActive(false);
-            if (coneRightInstance) coneRightInstance.SetActive(false);
 
             ClearTrackColliders();
             ResetLapState();

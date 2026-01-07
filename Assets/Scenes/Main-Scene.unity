@@ -645,6 +645,12 @@ PrefabInstance:
       propertyPath: _itemObjectList.Array.data[9]
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 7516113878477696655, guid: f1d9016331fff514a9d58e3296b6d24d,
+        type: 3}
+      propertyPath: _mainTestInstruction.Array.data[5].audioClip
+      value: 
+      objectReference: {fileID: 11400000, guid: d037dc47fec496644b7fd5fe43dc36e2,
+        type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

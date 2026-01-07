@@ -20,6 +20,7 @@ namespace WalkingTest
         [SerializeField] private GameObject _boxItem;
         [SerializeField] private TextMeshPro _scoreText;
         [SerializeField] private List<MeshRenderer> _starList;
+        [SerializeField] private List<GameObject> _boxFill;
         [SerializeField] private Material _yellowMaterial;
         [SerializeField] private Material _greyMaterial;
 
@@ -27,13 +28,15 @@ namespace WalkingTest
             List<ItemObject> itemList,
             GameObject boxItem,
             TextMeshPro scoreText,
-            List<MeshRenderer> starList
+            List<MeshRenderer> starList,
+            List<GameObject> boxFill
         )
         {
             _itemObjectList = itemList;
             _boxItem = boxItem;
             _scoreText = scoreText;
             _starList = starList;
+            _boxFill = boxFill;
         }
 
         [Header("Component | Countdown & Timer")]
@@ -131,7 +134,7 @@ namespace WalkingTest
                     }
 
                     //! hitung apakah player sudah melewati 1 putaran
-                    /* _wayPointGenerator.onReachingLap.RemoveAllListeners();
+                    _wayPointGenerator.onReachingLap.RemoveAllListeners();
                     _wayPointGenerator.onReachingLap.AddListener((int n) =>
                     {
                         if (n == 1)
@@ -144,7 +147,7 @@ namespace WalkingTest
                             });
                             SFXManager.Main.PlayFromSFXObjectLibrary("6trialsuccess");
                         }
-                    }); */
+                    });
 
                     _canvasManager.SetActiveCountDown(false, $"", "");
                     StartTimer(() =>
@@ -190,14 +193,19 @@ namespace WalkingTest
                 {
                     onHideCanvas?.Invoke();
 
-                    /* _wayPointGenerator.onReachingLap.RemoveAllListeners();
+                    _wayPointGenerator.onReachingLap.RemoveAllListeners();
                     _wayPointGenerator.onReachingLap.AddListener((int n) =>
                     {
-                        foreach (var obj in _itemObjectList)
+                        /* foreach (var obj in _itemObjectList)
                         {
                             obj.gameObject.SetActive(true);
+                        } */
+
+                        if(n > 0 && n <= _boxFill.Count)
+                        {
+                            _boxFill[n-1].SetActive(true);
                         }
-                    }); */
+                    });
 
                     foreach (var obj in _itemObjectList)
                     {
