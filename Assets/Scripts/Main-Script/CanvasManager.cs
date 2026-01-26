@@ -23,6 +23,9 @@ namespace WalkingTest
 
         private int m_currentPanelIndex = 0;
 
+        [Header("Component References")]
+        [SerializeField] private WorldCanvasFollower _canvasFollowingPlayer;
+
         [Header("Panel | Result")]
         [SerializeField] private UserData _userData;
         [SerializeField] private TestResultData _2mwtData;
@@ -179,6 +182,8 @@ namespace WalkingTest
 
         public void SetActiveCountDown(bool isActive, string val, string instruction)
         {
+            _canvasFollowingPlayer.ShowCanvas();
+
             foreach (var p in panels)
             {
                 if (p.gameObject != null)
@@ -237,6 +242,8 @@ namespace WalkingTest
 
         public void SetActiveHint(Sprite icon, string msg, float timeToHide)
         {
+            _canvasFollowingPlayer.ShowCanvas();
+            
             if (_popupCountdown.activeSelf)
                 _popupCountdown.SetActive(false);
 
