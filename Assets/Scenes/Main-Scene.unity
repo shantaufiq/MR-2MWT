@@ -3708,6 +3708,7 @@ MonoBehaviour:
     buttonNext: {fileID: 916559954}
   - gameObject: {fileID: 1309585621}
     buttonNext: {fileID: 1309585620}
+  _canvasFollowingPlayer: {fileID: 308633150}
   _userData:
     username: 
     age: 0

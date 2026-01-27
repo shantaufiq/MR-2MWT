@@ -29,17 +29,24 @@ namespace WalkingTest
 
         private void Awake()
         {
-            m_walkTestManager = FindObjectOfType<WalkTestManager>();
+            if (m_walkTestManager == null)
+            {
+                m_walkTestManager = FindObjectOfType<WalkTestManager>();
+            }
         }
 
         public void SpawnAsset(bool isClockWize)
         {
+            if (m_walkTestManager == null)
+            {
+                m_walkTestManager = FindObjectOfType<WalkTestManager>();
+            }
+
+            m_clockWiseAsset.SetActive(isClockWize);
+            m_nonClockWiseAsset.SetActive(!isClockWize);
 
             if (isClockWize)
             {
-                m_clockWiseAsset.SetActive(true);
-                m_nonClockWiseAsset.SetActive(false);
-
                 m_walkTestManager.InitGamifiAsset(
                     _CW_itemObjectList,
                     _CW_boxItem,
@@ -50,9 +57,6 @@ namespace WalkingTest
             }
             else
             {
-                m_clockWiseAsset.SetActive(false);
-                m_nonClockWiseAsset.SetActive(true);
-
                 m_walkTestManager.InitGamifiAsset(
                     _itemObjectList,
                     _boxItem,
