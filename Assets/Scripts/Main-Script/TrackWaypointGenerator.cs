@@ -198,6 +198,7 @@ namespace WalkingTest
         private void ToggleClockwiseChanged(bool isOn)
         {
             clockwise = isOn == false ? !DefaultClockwiseFor(orientation) : DefaultClockwiseFor(orientation);
+
             RegenerateAll();
         }
 
@@ -250,6 +251,7 @@ namespace WalkingTest
             FWD = Vector3.Cross(RIGHT, UP).normalized;
         }
 
+        private GamificationAssetContainer m_gameAsset;
 
         private void Generate()
         {
@@ -263,6 +265,12 @@ namespace WalkingTest
             ResolveAxes(out Vector3 RIGHT, out Vector3 FWD, out Vector3 UP);
 
             Transform main = floorSpawner.GetFloorMainObject();
+
+            if (m_gameAsset == null)
+            {
+                m_gameAsset = main.GetComponentInParent<GamificationAssetContainer>();
+            }
+
             if (!main)
             {
                 Debug.LogWarning("Main Object belum tersedia.");
@@ -335,6 +343,9 @@ namespace WalkingTest
                     pts.Add(centerLeft + RIGHT * lx + FWD * lz);
                 }
             }
+
+            // 4. spawn asset 
+            m_gameAsset.SpawnAsset(clockwise);
 
             lr.positionCount = pts.Count;
             lr.SetPositions(pts.ToArray());

@@ -94,6 +94,24 @@ namespace Meta.XR.MRUtilityKit
             }
         }
 
+        /* public void SetFloorLocalX(float x)
+        {
+            CacheFloorAnchorIfNeeded();
+            if (_cachedFloorAnchor == null) return;
+
+            // Update offset
+            PositionOffset = new Vector3(x, PositionOffset.y, PositionOffset.z);
+
+            // Apply ulang ke object floor yang sedang aktif/spawned
+            var target = GetCurrentTargetTransform();
+            if (target != null)
+            {
+                ApplyPlacement(target, _cachedFloorAnchor);
+                onFloorTransformChanged?.Invoke();
+            }
+        } */
+
+
         #endregion
 
         #region Core Logic
@@ -154,14 +172,9 @@ namespace Meta.XR.MRUtilityKit
             return _spawnedInstance ? _spawnedInstance.transform : null;
         }
 
-        public Transform GetSpawnedFloorRoot()
-        {
-            return GetCurrentTargetTransform();
-        }
-
         public Transform GetFloorMainObject()
         {
-            var root = GetSpawnedFloorRoot();
+            var root = GetCurrentTargetTransform();
             return root ? root.Find("Main Object") : null;
         }
 

@@ -206,9 +206,9 @@ namespace WalkingTest
                             obj.gameObject.SetActive(true);
                         } */
 
-                        if(n > 0 && n <= _boxFill.Count)
+                        if (n > 0 && n <= _boxFill.Count)
                         {
-                            _boxFill[n-1].SetActive(true);
+                            _boxFill[n - 1].SetActive(true);
                         }
                     });
 
