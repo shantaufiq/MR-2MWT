@@ -23,13 +23,15 @@ namespace WalkingTest
         [SerializeField] private List<GameObject> _boxFill;
         [SerializeField] private Material _yellowMaterial;
         [SerializeField] private Material _greyMaterial;
+        [SerializeField] private StartAreaTrigger _areaTrigger;
 
         public void InitGamifiAsset(
             List<ItemObject> itemList,
             GameObject boxItem,
             TextMeshPro scoreText,
             List<MeshRenderer> starList,
-            List<GameObject> boxFill
+            List<GameObject> boxFill,
+            StartAreaTrigger areaTrigger
         )
         {
             _itemObjectList = itemList;
@@ -37,6 +39,7 @@ namespace WalkingTest
             _scoreText = scoreText;
             _starList = starList;
             _boxFill = boxFill;
+            _areaTrigger = areaTrigger;
         }
 
         [Header("Component | Countdown & Timer")]
@@ -112,9 +115,14 @@ namespace WalkingTest
             ResetScore();
             _smartwatch.ResetVisualValue();
 
-            //! _wayPointGenerator.SpawnGamificationArena();
+            _areaTrigger.isStartAreaTriggerActive = true;
+            _areaTrigger.mesh.enabled = true;
+
             _canvasManager.ShowPanel(5, () =>
             {
+                _areaTrigger.isStartAreaTriggerActive = false;
+                _areaTrigger.mesh.enabled = false;
+
                 if (_countdownRoutine != null)
                 {
                     StopCoroutine(_countdownRoutine);
@@ -170,7 +178,8 @@ namespace WalkingTest
 
         public void StartMainTest(Action onHideCanvas)
         {
-            //! check apakah player sudah di titik start atau belum
+            _areaTrigger.isStartAreaTriggerActive = true;
+            _areaTrigger.mesh.enabled = true;
 
             SFXManager.Main.StopAll();
             SFXManager.Main.PlayFromSFXObjectLibrary("7testintro");
@@ -181,9 +190,11 @@ namespace WalkingTest
 
             _smartwatch.ResetVisualValue();
 
-            //! _wayPointGenerator.SpawnGamificationArena();
             _canvasManager.ShowPanel(7, () =>
             {
+                _areaTrigger.isStartAreaTriggerActive = false;
+                _areaTrigger.mesh.enabled = false;
+
                 if (_countdownRoutine != null)
                 {
                     StopCoroutine(_countdownRoutine);

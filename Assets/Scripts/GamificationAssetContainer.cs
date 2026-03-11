@@ -24,8 +24,10 @@ namespace WalkingTest
         [Header("Asset Parent")]
         [SerializeField] private GameObject m_clockWiseAsset;
         [SerializeField] private GameObject m_nonClockWiseAsset;
+        [SerializeField] private StartAreaTrigger areaTrigger;
 
         private WalkTestManager m_walkTestManager;
+        private bool _isClockWize;
 
         private void Awake()
         {
@@ -52,7 +54,8 @@ namespace WalkingTest
                     _CW_boxItem,
                     _CW_scoreText,
                     _CW_starList,
-                    _CW_boxFill
+                    _CW_boxFill,
+                    areaTrigger
                 );
             }
             else
@@ -62,8 +65,23 @@ namespace WalkingTest
                     _boxItem,
                     _scoreText,
                     _starList,
-                    _boxFill
+                    _boxFill,
+                    areaTrigger
                 );
+            }
+
+            _isClockWize = isClockWize;
+        }
+
+        public void SetEnableAsset(bool isActive)
+        {
+            if (_isClockWize)
+            {
+                m_clockWiseAsset.SetActive(isActive);
+            }
+            else
+            {
+                m_nonClockWiseAsset.SetActive(isActive);
             }
         }
     }

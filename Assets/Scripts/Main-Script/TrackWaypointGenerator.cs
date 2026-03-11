@@ -344,7 +344,7 @@ namespace WalkingTest
                 }
             }
 
-            // 4. spawn asset 
+            // 5. spawn asset 
             m_gameAsset.SpawnAsset(clockwise);
 
             lr.positionCount = pts.Count;
