@@ -19,7 +19,6 @@ namespace WalkingTest
 
         private void FixedUpdate()
         {
-            // Menu button (≡) on Meta Quest
             if (m_isTracking)
             {
                 TrackCanvas();

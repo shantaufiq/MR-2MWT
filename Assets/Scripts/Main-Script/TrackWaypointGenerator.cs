@@ -557,11 +557,6 @@ namespace WalkingTest
             ResetLapState();
         }
 
-
-        // =========================================================
-        // ================= TRACK VISIBILITY API ===================
-        // =========================================================
-
         public void HideTrack()
         {
             lr.enabled = false;

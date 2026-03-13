@@ -91,10 +91,10 @@ namespace WalkingTest
                     _canvasManager.ShowPanel(4, () => NextStage());
                     break;
                 case AppState.Trial:
-                    _walkTestManager.StartTrialTest(() => _canvasFollowingPlayer.HideCanvas());
+                    _walkTestManager.StartTrialTest();
                     break;
                 case AppState.MainTest:
-                    _walkTestManager.StartMainTest(() => _canvasFollowingPlayer.HideCanvas());
+                    _walkTestManager.StartMainTest();
                     break;
                 case AppState.Result:
                     _canvasFollowingPlayer.ShowCanvas();

@@ -105,7 +105,7 @@ namespace WalkingTest
             _wayPointGenerator.SpawnFloorAtPlayer();
         }
 
-        public void StartTrialTest(Action onHideCanvas)
+        public void StartTrialTest(Action onHideCanvas = null)
         {
             SFXManager.Main.StopAll();
             SFXManager.Main.PlayFromSFXObjectLibrary("5trialintro");
@@ -128,6 +128,7 @@ namespace WalkingTest
                     StopCoroutine(_countdownRoutine);
                     _countdownRoutine = null;
                 }
+
                 SFXManager.Main.StopAll();
 
                 if (m_thresholdEvents.Count > 0) m_thresholdEvents.Clear();
@@ -158,6 +159,7 @@ namespace WalkingTest
                             {
                                 _applicationManager.NextStage();
                             });
+
                             SFXManager.Main.PlayFromSFXObjectLibrary("6trialsuccess");
                         }
                     });
@@ -176,7 +178,7 @@ namespace WalkingTest
             });
         }
 
-        public void StartMainTest(Action onHideCanvas)
+        public void StartMainTest(Action onHideCanvas = null)
         {
             _areaTrigger.isStartAreaTriggerActive = true;
             _areaTrigger.mesh.enabled = true;
