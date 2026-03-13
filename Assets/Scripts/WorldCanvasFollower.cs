@@ -30,12 +30,8 @@ namespace WalkingTest
         {
             m_isTracking = true;
 
-            // Invoke(nameof(IsTrackingFalse), 5f);
-        }
-
-        private void IsTrackingFalse()
-        {
-            m_isTracking = false;
+            if (!canvasRoot)
+                canvasRoot.SetActive(false);
         }
 
         private void TrackCanvas()
