@@ -12,6 +12,11 @@ namespace WalkingTest
         [SerializeField] private Color _normalColor = Color.white;
         [SerializeField] private Color _criticalColor = Color.red;
         [SerializeField] private float _criticalThresholdSeconds = 5f;
+        private float _AvgSpeed = 0;
+        public float GetAverageSpeed()
+        {
+            return _AvgSpeed;
+        }
 
         [Header("Component References")]
         [SerializeField] private GameObject _smartwatchModel;
@@ -64,7 +69,8 @@ namespace WalkingTest
 
         public void SetAverageSpeedPerMin(float speedAverage)
         {
-            _textSpeed.text = $"{speedAverage:F0} m/min";
+            _AvgSpeed = speedAverage;
+            _textSpeed.text = $"{_AvgSpeed:F1} m/min";
         }
 
         public void SetDinstance(float totalDistance)

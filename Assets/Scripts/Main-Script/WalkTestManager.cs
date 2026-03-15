@@ -238,6 +238,7 @@ namespace WalkingTest
                         _MRDistanceTracker.StopTracking();
                         _MRDistanceTracker.GetResult((x) => _6MWTData.totalDistance = x, (x) => _6MWTData.correctWay = x, (x) => _6MWTData.wrongWay = x);
                         _6MWTData.totalLaps = _wayPointGenerator.lapsCompleted;
+                        _6MWTData.walkingSpeed = _smartwatch.GetAverageSpeed();
 
                         SFXManager.Main.PlayFromSFXObjectLibrary("8testsuccess");
                         _canvasManager.SetActiveCountDown(false, $"", "");
@@ -269,6 +270,7 @@ namespace WalkingTest
         {
             _MRDistanceTracker.GetResult((x) => _2MWTData.totalDistance = x, (x) => _2MWTData.correctWay = x, (x) => _2MWTData.wrongWay = x);
             _2MWTData.totalLaps = _wayPointGenerator.lapsCompleted;
+            _2MWTData.walkingSpeed = _smartwatch.GetAverageSpeed();
         }
 
         private float CountAvarageSpeedPerMin(float totalDistance, float totalWalkingTimeSeconds)

@@ -1688,6 +1688,21 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: d037dc47fec496644b7fd5fe43dc36e2,
         type: 2}
+    - target: {fileID: 7516113878477696655, guid: f1d9016331fff514a9d58e3296b6d24d,
+        type: 3}
+      propertyPath: _mainTestInstruction.Array.data[2].onThreshold.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7516113878477696655, guid: f1d9016331fff514a9d58e3296b6d24d,
+        type: 3}
+      propertyPath: _mainTestInstruction.Array.data[3].onThreshold.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7516113878477696655, guid: f1d9016331fff514a9d58e3296b6d24d,
+        type: 3}
+      propertyPath: _mainTestInstruction.Array.data[4].onThreshold.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -11063,6 +11078,26 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.x
       value: 99.94
       objectReference: {fileID: 0}
+    - target: {fileID: 1346799593862011849, guid: ddf197c893c31f647b0e70ad830a2cb5,
+        type: 3}
+      propertyPath: items.Array.data[0].onSelected.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 886365272}
+    - target: {fileID: 1346799593862011849, guid: ddf197c893c31f647b0e70ad830a2cb5,
+        type: 3}
+      propertyPath: items.Array.data[1].onSelected.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 886365272}
+    - target: {fileID: 1346799593862011849, guid: ddf197c893c31f647b0e70ad830a2cb5,
+        type: 3}
+      propertyPath: items.Array.data[0].onSelected.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Set2MWTData
+      objectReference: {fileID: 0}
+    - target: {fileID: 1346799593862011849, guid: ddf197c893c31f647b0e70ad830a2cb5,
+        type: 3}
+      propertyPath: items.Array.data[1].onSelected.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Set6MWTData
+      objectReference: {fileID: 0}
     - target: {fileID: 1870813949715696460, guid: ddf197c893c31f647b0e70ad830a2cb5,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -18924,7 +18959,7 @@ SceneRoots:
   - {fileID: 1420984764}
   - {fileID: 308633149}
   - {fileID: 828352659}
-  - {fileID: 2135970178}
   - {fileID: 264179144}
   - {fileID: 1126734602}
+  - {fileID: 2135970178}
   - {fileID: 2053332037}

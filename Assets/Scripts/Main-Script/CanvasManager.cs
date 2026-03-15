@@ -243,7 +243,7 @@ namespace WalkingTest
         public void SetActiveHint(Sprite icon, string msg, float timeToHide)
         {
             _canvasFollowingPlayer.ShowCanvas();
-            
+
             if (_popupCountdown.activeSelf)
                 _popupCountdown.SetActive(false);
 
