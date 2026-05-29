@@ -38,6 +38,10 @@ namespace WalkingTest
         [Header("Penempatan")]
         [SerializeField] private float trackY = 0f;
 
+        // ---------- LINE RENDERER ----------
+        [Header("Line Renderer")]
+        [SerializeField] private float lineWidth = 0.25f;
+
         // ---------- COLLIDERS ----------
         [Header("Track Colliders")]
         [SerializeField] private bool buildColliders = true;
@@ -86,6 +90,7 @@ namespace WalkingTest
         // =========================================================
         // ======================= AWAKE ============================
         // =========================================================
+
 
         void Awake()
         {
@@ -344,9 +349,10 @@ namespace WalkingTest
                 }
             }
 
-            // 5. spawn asset 
-            m_gameAsset.SpawnAsset(clockwise);
+            // 5. spawn asset
+            m_gameAsset?.SpawnAsset(clockwise);
 
+            lr.widthMultiplier = Mathf.Max(0.01f, lineWidth);
             lr.positionCount = pts.Count;
             lr.SetPositions(pts.ToArray());
         }

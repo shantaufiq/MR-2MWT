@@ -1609,6 +1609,11 @@ PrefabInstance:
       objectReference: {fileID: 828352660}
     - target: {fileID: 7516113878477696655, guid: f1d9016331fff514a9d58e3296b6d24d,
         type: 3}
+      propertyPath: _starList.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7516113878477696655, guid: f1d9016331fff514a9d58e3296b6d24d,
+        type: 3}
       propertyPath: _starList.Array.data[0]
       value: 
       objectReference: {fileID: 0}
@@ -1631,6 +1636,11 @@ PrefabInstance:
         type: 3}
       propertyPath: _starList.Array.data[4]
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7516113878477696655, guid: f1d9016331fff514a9d58e3296b6d24d,
+        type: 3}
+      propertyPath: _itemObjectList.Array.size
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7516113878477696655, guid: f1d9016331fff514a9d58e3296b6d24d,
         type: 3}
@@ -8796,6 +8806,11 @@ PrefabInstance:
       objectReference: {fileID: 829521936}
     - target: {fileID: 1279936435802837023, guid: 9b1fd2b177dd01049bd278706961dd2d,
         type: 3}
+      propertyPath: radius
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279936435802837023, guid: 9b1fd2b177dd01049bd278706961dd2d,
+        type: 3}
       propertyPath: trackY
       value: 0.1
       objectReference: {fileID: 0}
@@ -8811,6 +8826,16 @@ PrefabInstance:
       objectReference: {fileID: 1672648234}
     - target: {fileID: 1279936435802837023, guid: 9b1fd2b177dd01049bd278706961dd2d,
         type: 3}
+      propertyPath: arcDepth
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279936435802837023, guid: 9b1fd2b177dd01049bd278706961dd2d,
+        type: 3}
+      propertyPath: lineWidth
+      value: 0.55
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279936435802837023, guid: 9b1fd2b177dd01049bd278706961dd2d,
+        type: 3}
       propertyPath: floorSpawner
       value: 
       objectReference: {fileID: 1420984766}
@@ -8824,6 +8849,11 @@ PrefabInstance:
       propertyPath: centerEyeAnchor
       value: 
       objectReference: {fileID: 1767634675}
+    - target: {fileID: 1279936435802837023, guid: 9b1fd2b177dd01049bd278706961dd2d,
+        type: 3}
+      propertyPath: generateOnStart
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1279936435802837023, guid: 9b1fd2b177dd01049bd278706961dd2d,
         type: 3}
       propertyPath: ccwFloorRightOffset
@@ -9533,7 +9563,7 @@ SkinnedMeshRenderer:
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
   m_MotionVectors: 1
-  m_LightProbeUsage: 1
+  m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 3
   m_RayTraceProcedural: 0
@@ -9852,7 +9882,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 0.1
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
@@ -9869,7 +9899,7 @@ MeshRenderer:
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
   m_MotionVectors: 1
-  m_LightProbeUsage: 1
+  m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
@@ -10282,7 +10312,7 @@ SkinnedMeshRenderer:
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
   m_MotionVectors: 1
-  m_LightProbeUsage: 1
+  m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 3
   m_RayTraceProcedural: 0

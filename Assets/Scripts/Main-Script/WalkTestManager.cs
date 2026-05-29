@@ -232,7 +232,7 @@ namespace WalkingTest
                     }
 
                     _MRDistanceTracker.StartTracking();
-                    _canvasManager.SetActiveCountDown(false, $"", "J");
+                    _canvasManager.SetActiveCountDown(false, $"", "");
                     StartTimer(() =>
                     {
                         _MRDistanceTracker.StopTracking();
@@ -243,10 +243,10 @@ namespace WalkingTest
                         SFXManager.Main.PlayFromSFXObjectLibrary("8testsuccess");
                         _canvasManager.SetActiveCountDown(false, $"", "");
                         _wayPointGenerator.HideTrack();
-                        StoreTestResult();
 
                         _canvasManager.ShowPanel(8, () =>
                         {
+                            StoreTestResult();
                             _applicationManager.NextStage();
                         });
 
