@@ -68,8 +68,8 @@ public class MRWalkingTracker_Quest3_MixamoFootSteps : MonoBehaviour
     [Tooltip("Noise threshold per frame (meter).")]
     [SerializeField] private float frameThreshold = 0.005f;
 
-    [Tooltip("Akumulasi minimum jarak agar dianggap berjalan (meter).")]
-    [SerializeField] private float windowThreshold = 0.02f;
+    [Tooltip("Akumulasi minimum jarak agar dianggap berjalan (meter). Dikurangi dari 0.02 ke 0.01 untuk mengurangi window discard.")]
+    [SerializeField] private float windowThreshold = 0.01f;
 
     [Tooltip("Durasi evaluasi window (detik).")]
     [SerializeField] private float windowDuration = 0.20f;
@@ -80,10 +80,15 @@ public class MRWalkingTracker_Quest3_MixamoFootSteps : MonoBehaviour
     [Tooltip("Minimum linear velocity agar dianggap berjalan (m/s).")]
     [SerializeField] private float minLinearVelocity = 0.10f;
 
+    [Header("Calibration")]
+    [Tooltip("Faktor skala jarak akhir. Gunakan untuk kalibrasi sistematis: jika jarak tercatat < aktual, naikkan nilai ini (contoh: jika 25m tercatat untuk 30m aktual, set 1.2).")]
+    [Range(0.5f, 2.0f)]
+    [SerializeField] private float distanceScale = 1.0f;
+
     [Header("Direction Validation")]
-    [Tooltip("Minimal alignment (dot) antara arah gerak dan forward untuk dianggap berjalan maju.")]
+    [Tooltip("Minimal alignment (dot) antara arah gerak dan forward. Set -1.0 untuk nonaktifkan (direkomendasikan: -1.0 karena filter velocity sudah cukup, dan filter ini sering salah-reject saat tikungan karena IK avatar lag).")]
     [Range(-1f, 1f)]
-    [SerializeField] private float minForwardAlignment = 0.20f;
+    [SerializeField] private float minForwardAlignment = -1.0f;
 
     [Header("Hip Validation (Optional)")]
     [Tooltip("Minimum pergerakan hips per frame (meter) untuk validasi biomekanik. Set 0 untuk disable.")]
@@ -323,9 +328,10 @@ public class MRWalkingTracker_Quest3_MixamoFootSteps : MonoBehaviour
         {
             if (pendingWindowDistance >= windowThreshold)
             {
-                totalDistance += pendingWindowDistance;
-                correctDistance += pendingWindowCorrect;
-                wrongDistance += pendingWindowWrong;
+                float scale = Mathf.Max(0.01f, distanceScale);
+                totalDistance += pendingWindowDistance * scale;
+                correctDistance += pendingWindowCorrect * scale;
+                wrongDistance += pendingWindowWrong * scale;
             }
             ResetWindow();
         }

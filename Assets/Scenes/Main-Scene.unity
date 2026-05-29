@@ -1700,8 +1700,13 @@ PrefabInstance:
         type: 2}
     - target: {fileID: 7516113878477696655, guid: f1d9016331fff514a9d58e3296b6d24d,
         type: 3}
+      propertyPath: _mainTestInstruction.Array.data[1].onThreshold.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7516113878477696655, guid: f1d9016331fff514a9d58e3296b6d24d,
+        type: 3}
       propertyPath: _mainTestInstruction.Array.data[2].onThreshold.m_PersistentCalls.m_Calls.Array.size
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7516113878477696655, guid: f1d9016331fff514a9d58e3296b6d24d,
         type: 3}
@@ -1711,6 +1716,21 @@ PrefabInstance:
     - target: {fileID: 7516113878477696655, guid: f1d9016331fff514a9d58e3296b6d24d,
         type: 3}
       propertyPath: _mainTestInstruction.Array.data[4].onThreshold.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7516113878477696655, guid: f1d9016331fff514a9d58e3296b6d24d,
+        type: 3}
+      propertyPath: _mainTestInstruction.Array.data[2].onThreshold.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7516113878477696655, guid: f1d9016331fff514a9d58e3296b6d24d,
+        type: 3}
+      propertyPath: _mainTestInstruction.Array.data[2].onThreshold.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ShowStar
+      objectReference: {fileID: 0}
+    - target: {fileID: 7516113878477696655, guid: f1d9016331fff514a9d58e3296b6d24d,
+        type: 3}
+      propertyPath: _mainTestInstruction.Array.data[2].onThreshold.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -11026,12 +11046,13 @@ MonoBehaviour:
   groundRayLength: 2.5
   groundStatusRenderer: {fileID: 0}
   frameThreshold: 0.005
-  windowThreshold: 0.02
+  windowThreshold: 0.005
   windowDuration: 0.2
   maxStep: 1.2
-  minLinearVelocity: 0.1
-  minForwardAlignment: 0.2
-  hipFrameThreshold: 0.003
+  minLinearVelocity: 0.05
+  distanceScale: 0.95
+  minForwardAlignment: -1
+  hipFrameThreshold: 0
   enableFootSteps: 1
   footRayUpOffset: 0.08
   footRayLength: 0.35

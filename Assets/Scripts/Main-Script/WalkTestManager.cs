@@ -44,6 +44,7 @@ namespace WalkingTest
 
         [Header("Component | Countdown & Timer")]
         [SerializeField] private float _testDuration = 360f;
+        [SerializeField] private float _2mwtDuration = 120f;
         [SerializeField] private SFXObject _countdownAudio;
         [SerializeField] private List<TimerThreshold> _trialInstruction = new List<TimerThreshold>() { };
         [SerializeField] private List<TimerThreshold> _mainTestInstruction = new List<TimerThreshold>() { };
@@ -81,6 +82,8 @@ namespace WalkingTest
 
             [HideInInspector] public bool _fired;
         }
+
+        private Coroutine _capture2MWTRoutine;
 
         private float _duration;
         private float _remainingTime;
@@ -233,8 +236,14 @@ namespace WalkingTest
 
                     _MRDistanceTracker.StartTracking();
                     _canvasManager.SetActiveCountDown(false, $"", "");
+                    _capture2MWTRoutine = StartCoroutine(Capture2MWTAfter(_2mwtDuration));
                     StartTimer(() =>
                     {
+                        if (_capture2MWTRoutine != null)
+                        {
+                            StopCoroutine(_capture2MWTRoutine);
+                            _capture2MWTRoutine = null;
+                        }
                         _MRDistanceTracker.StopTracking();
                         _MRDistanceTracker.GetResult((x) => _6MWTData.totalDistance = x, (x) => _6MWTData.correctWay = x, (x) => _6MWTData.wrongWay = x);
                         _6MWTData.totalLaps = _wayPointGenerator.lapsCompleted;
@@ -264,6 +273,19 @@ namespace WalkingTest
         private void StoreTestResult()
         {
             _applicationManager.StoreTestResultData(_2MWTData, _6MWTData);
+        }
+
+        private IEnumerator Capture2MWTAfter(float seconds)
+        {
+            float elapsed = 0f;
+            while (elapsed < seconds)
+            {
+                if (!_isPaused)
+                    elapsed += Time.deltaTime;
+                yield return null;
+            }
+            GetData2MWT();
+            _capture2MWTRoutine = null;
         }
 
         public void GetData2MWT() // call from event inspector
