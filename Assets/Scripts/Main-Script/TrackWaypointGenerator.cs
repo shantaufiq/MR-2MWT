@@ -62,6 +62,12 @@ namespace WalkingTest
         public int lapsCompleted;
         [SerializeField] private bool lapCountingEnabled = false;
 
+        [Header("Lap Counter - Distance Validation")]
+        [SerializeField] private bool _enableDistanceValidation = true;
+        [SerializeField] [Range(0.4f, 1.0f)] private float _lapDistanceTolerance = 0.7f;
+        public Func<float> getDistanceCallback;
+        private float _trackPerimeter = 0f;
+
         [Space(8f)]
         public UnityEvent<int> onReachingLap;
         [SerializeField] private UnityEvent onWrongWay;
@@ -76,6 +82,7 @@ namespace WalkingTest
         private bool passedStartEarly = false;
         private bool passedMiddle = false;
         private bool passedEndLate = false;
+        private bool _awaitingEndCheckpoint = false;
 
         private int cpA, cpB, midCp, cpEndA, cpEndB, cpTotal;
 
@@ -355,6 +362,11 @@ namespace WalkingTest
             lr.widthMultiplier = Mathf.Max(0.01f, lineWidth);
             lr.positionCount = pts.Count;
             lr.SetPositions(pts.ToArray());
+
+            // Hitung keliling track
+            _trackPerimeter = 0f;
+            for (int i = 0; i < pts.Count; i++)
+                _trackPerimeter += Vector3.Distance(pts[i], pts[(i + 1) % pts.Count]);
         }
 
         // =========================================================
@@ -442,39 +454,64 @@ namespace WalkingTest
         // =================== LAP SYSTEM LOGIC =====================
         // =========================================================
 
+        private bool TryCountLap()
+        {
+            if (_enableDistanceValidation && _trackPerimeter > 0.01f && getDistanceCallback != null)
+            {
+                float actual = getDistanceCallback.Invoke();
+                float required = (lapsCompleted + 1) * _trackPerimeter * _lapDistanceTolerance;
+                if (actual < required)
+                    return false;
+            }
+
+            lapsCompleted++;
+            onReachingLap?.Invoke(lapsCompleted);
+            return true;
+        }
+
         public void OnCheckpointPassed(int index)
         {
             if (!lapCountingEnabled) return;
 
             // ====================================================
-            // WRONG WAY + BACK TO CORRECT WAY (NEW)
+            // WRONG WAY + BACK TO CORRECT WAY
+            // Fix: wrap-around dari cpTotal-1 ke 0 bukan wrong way
             // ====================================================
             if (lastCheckpointPassed != -1)
             {
-                // Wrong direction
-                if (index < lastCheckpointPassed)
+                bool isWraparound = lastCheckpointPassed == cpTotal - 1 && index == 0;
+
+                if (!isWraparound)
                 {
-                    if (!isWrongWay)
+                    if (index < lastCheckpointPassed)
                     {
-                        isWrongWay = true;
-                        onWrongWay?.Invoke();
+                        if (!isWrongWay)
+                        {
+                            isWrongWay = true;
+                            _awaitingEndCheckpoint = false;
+                            onWrongWay?.Invoke();
+                        }
+                    }
+                    else if (index > lastCheckpointPassed)
+                    {
+                        if (isWrongWay)
+                        {
+                            isWrongWay = false;
+                            onBackToCorrectWay?.Invoke();
+                        }
                     }
                 }
-                // Correct direction again
-                else if (index > lastCheckpointPassed)
+                else if (isWrongWay)
                 {
-                    if (isWrongWay)
-                    {
-                        isWrongWay = false;
-                        onBackToCorrectWay?.Invoke();
-                    }
+                    isWrongWay = false;
+                    onBackToCorrectWay?.Invoke();
                 }
             }
 
             lastCheckpointPassed = index;
 
             // ====================================================
-            // LAP LOGIC (UNCHANGED)
+            // LAP LOGIC
             // ====================================================
 
             if (!lapStarted)
@@ -482,7 +519,6 @@ namespace WalkingTest
                 if (index == cpA)
                 {
                     lapStarted = true;
-
                     passedStartEarly = true;
                     passedMiddle = false;
                     passedEndLate = false;
@@ -497,19 +533,47 @@ namespace WalkingTest
                 passedMiddle = true;
 
             if (index == cpEndA || index == cpEndB)
+            {
                 passedEndLate = true;
+
+                // Fix: cpA bisa terpicu sebelum cpEndB karena keduanya berbagi boundary di pts[0].
+                // Jika cpA sudah terpicu duluan (_awaitingEndCheckpoint=true), hitung lap sekarang.
+                if (_awaitingEndCheckpoint && passedMiddle)
+                {
+                    _awaitingEndCheckpoint = false;
+                    if (TryCountLap())
+                    {
+                        passedStartEarly = true;
+                        passedMiddle = false;
+                        passedEndLate = false;
+                    }
+                    return;
+                }
+            }
 
             if (index == cpA)
             {
                 if (passedStartEarly && passedMiddle && passedEndLate)
                 {
-                    lapsCompleted++;
-                    onReachingLap?.Invoke(lapsCompleted);
+                    if (TryCountLap())
+                    {
+                        passedStartEarly = true;
+                        passedMiddle = false;
+                        passedEndLate = false;
+                    }
                 }
-
-                passedStartEarly = true;
-                passedMiddle = false;
-                passedEndLate = false;
+                else if (passedMiddle && !passedEndLate)
+                {
+                    // cpA terpicu sebelum cpEndB — tunggu cpEndB untuk menghitung lap
+                    _awaitingEndCheckpoint = true;
+                    passedStartEarly = true;
+                }
+                else
+                {
+                    passedStartEarly = true;
+                    passedMiddle = false;
+                    passedEndLate = false;
+                }
             }
         }
 
@@ -517,6 +581,7 @@ namespace WalkingTest
         {
             lapsCompleted = 0;
             lapStarted = false;
+            _awaitingEndCheckpoint = false;
 
             passedStartEarly = false;
             passedMiddle = false;

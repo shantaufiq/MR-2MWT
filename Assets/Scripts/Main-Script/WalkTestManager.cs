@@ -235,6 +235,7 @@ namespace WalkingTest
                     }
 
                     _MRDistanceTracker.StartTracking();
+                    _wayPointGenerator.getDistanceCallback = () => _MRDistanceTracker.TotalDistance;
                     _canvasManager.SetActiveCountDown(false, $"", "");
                     _capture2MWTRoutine = StartCoroutine(Capture2MWTAfter(_2mwtDuration));
                     StartTimer(() =>
@@ -244,6 +245,7 @@ namespace WalkingTest
                             StopCoroutine(_capture2MWTRoutine);
                             _capture2MWTRoutine = null;
                         }
+                        _wayPointGenerator.getDistanceCallback = null;
                         _MRDistanceTracker.StopTracking();
                         _MRDistanceTracker.GetResult((x) => _6MWTData.totalDistance = x, (x) => _6MWTData.correctWay = x, (x) => _6MWTData.wrongWay = x);
                         _6MWTData.totalLaps = _wayPointGenerator.lapsCompleted;
