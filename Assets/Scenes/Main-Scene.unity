@@ -1700,6 +1700,11 @@ PrefabInstance:
         type: 2}
     - target: {fileID: 7516113878477696655, guid: f1d9016331fff514a9d58e3296b6d24d,
         type: 3}
+      propertyPath: _mainTestInstruction.Array.data[0].textInformation
+      value: Jalan ke depan mengikuti arah lintasan
+      objectReference: {fileID: 0}
+    - target: {fileID: 7516113878477696655, guid: f1d9016331fff514a9d58e3296b6d24d,
+        type: 3}
       propertyPath: _mainTestInstruction.Array.data[1].onThreshold.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -3984,6 +3989,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6327113545155329774, guid: ab417eb7dda2fa54fb2557f2dedd4d0a,
+        type: 3}
+      propertyPath: m_text
+      value: 'Aktivitas yang akan dilakukan
+
+
+        Kamu hanya perlu berjalan sejauh
+        yang kamu bisa, dan tidak perlu berlari atau memaksakan diri. Jika di tengah
+        perjalanan kamu merasa lelah, kamu diperbolehkan berhenti untuk beristirahat.'
       objectReference: {fileID: 0}
     - target: {fileID: 6393598626688396302, guid: ab417eb7dda2fa54fb2557f2dedd4d0a,
         type: 3}
