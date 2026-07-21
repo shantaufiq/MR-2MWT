@@ -80,6 +80,13 @@ public class MRWalkingTracker_Quest3_MixamoFootSteps : MonoBehaviour
     [Tooltip("Minimum linear velocity agar dianggap berjalan (m/s).")]
     [SerializeField] private float minLinearVelocity = 0.10f;
 
+    [Header("Position Smoothing")]
+    [Tooltip("Time constant (detik) low-pass filter pada posisi XZ kepala. Meredam goyangan lateral alami saat berjalan cepat/percaya diri " +
+        "(sway kiri-kanan antar langkah) yang kalau dijumlah mentah per-frame membuat total jarak lebih panjang dari jarak maju sebenarnya. " +
+        "0 = nonaktif (raw). Terlalu besar bisa memperparah under-estimate di tikungan tajam.")]
+    [Range(0f, 0.5f)]
+    [SerializeField] private float positionSmoothingTime = 0.15f;
+
     [Header("Calibration")]
     [Tooltip("Faktor skala jarak akhir. Gunakan untuk kalibrasi sistematis: jika jarak tercatat < aktual, naikkan nilai ini (contoh: jika 25m tercatat untuk 30m aktual, set 1.2).")]
     [Range(0.5f, 2.0f)]
@@ -162,6 +169,7 @@ public class MRWalkingTracker_Quest3_MixamoFootSteps : MonoBehaviour
 
     private Vector3 lastHeadPosWorld;
     private Vector3 lastHipPosWorld;
+    private Vector3 smoothedHeadXZ;
 
     // window pending
     private float pendingWindowDistance = 0f;
@@ -224,6 +232,7 @@ public class MRWalkingTracker_Quest3_MixamoFootSteps : MonoBehaviour
         ResetWindow();
 
         lastHeadPosWorld = GetHeadWorldPosition();
+        smoothedHeadXZ = new Vector3(lastHeadPosWorld.x, 0f, lastHeadPosWorld.z);
         if (hipsTransform != null) lastHipPosWorld = hipsTransform.position;
 
         if (leftFoot != null) lastLeftFootPos = leftFoot.position;
@@ -240,6 +249,7 @@ public class MRWalkingTracker_Quest3_MixamoFootSteps : MonoBehaviour
     public void InitialPlayerPosition()
     {
         lastHeadPosWorld = GetHeadWorldPosition();
+        smoothedHeadXZ = new Vector3(lastHeadPosWorld.x, 0f, lastHeadPosWorld.z);
         if (hipsTransform != null) lastHipPosWorld = hipsTransform.position;
 
         if (leftFoot != null) lastLeftFootPos = leftFoot.position;
@@ -258,7 +268,15 @@ public class MRWalkingTracker_Quest3_MixamoFootSteps : MonoBehaviour
     {
         Vector3 currentHeadWorld = GetHeadWorldPosition();
 
-        Vector3 curXZ = new Vector3(currentHeadWorld.x, 0f, currentHeadWorld.z);
+        // Low-pass filter posisi XZ mentah sebelum dipakai untuk menghitung dist. Ini meredam goyangan
+        // lateral alami antar langkah (sway kiri-kanan) yang kalau dijumlah mentah per-frame membuat
+        // total jarak lebih panjang dari jarak maju sebenarnya, terutama saat berjalan cepat/percaya diri.
+        Vector3 rawXZ = new Vector3(currentHeadWorld.x, 0f, currentHeadWorld.z);
+        float smoothAlpha = positionSmoothingTime > 0.0001f ? 1f - Mathf.Exp(-Time.deltaTime / positionSmoothingTime) : 1f;
+        smoothedHeadXZ = Vector3.Lerp(smoothedHeadXZ, rawXZ, smoothAlpha);
+        currentHeadWorld = new Vector3(smoothedHeadXZ.x, currentHeadWorld.y, smoothedHeadXZ.z);
+
+        Vector3 curXZ = smoothedHeadXZ;
         Vector3 lastXZ = new Vector3(lastHeadPosWorld.x, 0f, lastHeadPosWorld.z);
 
         float dist = Vector3.Distance(curXZ, lastXZ);
@@ -279,11 +297,14 @@ public class MRWalkingTracker_Quest3_MixamoFootSteps : MonoBehaviour
         }
 
         // Velocity validation
+        // Baseline (lastHeadPosWorld) sengaja TIDAK direset di sini. Saat pengguna melangkah pelan/ragu-ragu,
+        // velocity instan dari OVRPlugin bisa dip di bawah threshold sesaat meski posisi sudah bergeser nyata.
+        // Dengan membiarkan baseline tetap, jarak yang tertunda ikut terakumulasi ke "dist" frame berikutnya
+        // dan baru diklaim begitu ada frame yang lolos validasi, alih-alih hilang permanen tiap kali ditolak.
         Vector3 velWorld = GetHeadLinearVelocityWorld();
         float speed = velWorld.magnitude;
         if (speed < minLinearVelocity)
         {
-            UpdateLastPoses(currentHeadWorld);
             return;
         }
 
@@ -296,7 +317,6 @@ public class MRWalkingTracker_Quest3_MixamoFootSteps : MonoBehaviour
 
             if (hipDist < hipFrameThreshold)
             {
-                UpdateLastPoses(currentHeadWorld);
                 return;
             }
         }
@@ -312,7 +332,6 @@ public class MRWalkingTracker_Quest3_MixamoFootSteps : MonoBehaviour
         // Jika tidak sesuai arah maju, kita anggap "tidak valid berjalan" → tidak commit jarak
         if (alignment < minForwardAlignment)
         {
-            UpdateLastPoses(currentHeadWorld);
             return;
         }
 

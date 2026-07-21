@@ -586,6 +586,9 @@ namespace WalkingTest
             passedStartEarly = false;
             passedMiddle = false;
             passedEndLate = false;
+
+            lastCheckpointPassed = -1;
+            isWrongWay = false;
         }
 
         private void EnableLapCounting(bool enabled)

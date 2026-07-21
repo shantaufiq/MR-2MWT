@@ -4,7 +4,6 @@ using UnityEngine;
 using TMPro;
 using System;
 using UnityEngine.Events;
-using System.Linq;
 
 namespace WalkingTest
 {
@@ -217,10 +216,10 @@ namespace WalkingTest
                     _wayPointGenerator.onReachingLap.RemoveAllListeners();
                     _wayPointGenerator.onReachingLap.AddListener((int n) =>
                     {
-                        /* foreach (var obj in _itemObjectList)
+                        foreach (var obj in _itemObjectList)
                         {
                             obj.gameObject.SetActive(true);
-                        } */
+                        }
 
                         if (n > 0 && n <= _boxFill.Count)
                         {
@@ -461,14 +460,6 @@ namespace WalkingTest
             _collectedItemCount += newPoint;
             _scoreText.text = $"{_collectedItemCount}";
             Debug.Log($"score collected +{newPoint} | total : {_collectedItemCount}");
-
-            if (_itemObjectList.Count(x => !x.gameObject.activeSelf) >= 9 && m_thresholdEvents == _mainTestInstruction)
-            {
-                foreach (var obj in _itemObjectList)
-                {
-                    obj.gameObject.SetActive(true);
-                }
-            }
         }
 
         public void ResetScore()

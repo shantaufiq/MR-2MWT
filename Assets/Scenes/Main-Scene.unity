@@ -11065,7 +11065,7 @@ MonoBehaviour:
   windowDuration: 0.2
   maxStep: 1.2
   minLinearVelocity: 0.05
-  distanceScale: 0.95
+  distanceScale: 0.991
   minForwardAlignment: -1
   hipFrameThreshold: 0
   enableFootSteps: 1
