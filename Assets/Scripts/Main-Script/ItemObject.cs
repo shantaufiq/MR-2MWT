@@ -46,10 +46,10 @@ namespace WalkingTest
         {
             if (other.CompareTag("Player"))
             {
-                _walkTestManager.AddScore(pointValue);
                 SFXManager.Main.PlayFromSFXObjectLibrary("score");
-
                 gameObject.SetActive(false);
+
+                _walkTestManager.AddScore(pointValue);
             }
         }
 

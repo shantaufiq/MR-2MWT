@@ -216,10 +216,7 @@ namespace WalkingTest
                     _wayPointGenerator.onReachingLap.RemoveAllListeners();
                     _wayPointGenerator.onReachingLap.AddListener((int n) =>
                     {
-                        foreach (var obj in _itemObjectList)
-                        {
-                            obj.gameObject.SetActive(true);
-                        }
+                        RespawnAllItems();
 
                         if (n > 0 && n <= _boxFill.Count)
                         {
@@ -460,6 +457,34 @@ namespace WalkingTest
             _collectedItemCount += newPoint;
             _scoreText.text = $"{_collectedItemCount}";
             Debug.Log($"score collected +{newPoint} | total : {_collectedItemCount}");
+
+            // Primary respawn check: semua item sudah diambil sebelum lap selesai.
+            // Respawn per-lap (onReachingLap) tetap ada sebagai secondary check,
+            // untuk kondisi sebaliknya (lap sudah selesai tapi item belum terspawn).
+            if (_itemObjectList.TrueForAll(x => !x.gameObject.activeSelf))
+            {
+                RespawnAllItems();
+            }
+        }
+
+        // Ditunda 1 frame: item terakhir yang baru diambil masih SetActive(false) saat method
+        // ini dipanggil, dan collider player kemungkinan masih menempel/overlap dengannya.
+        // Kalau langsung SetActive(true) di frame yang sama, Unity akan memicu ulang
+        // OnTriggerEnter untuk item itu (collider yang di-enable ulang saat masih overlap
+        // dianggap kontak baru) -> skor dobel-hitung untuk 1 item yang sama.
+        private void RespawnAllItems()
+        {
+            StartCoroutine(RespawnAllItemsRoutine());
+        }
+
+        private IEnumerator RespawnAllItemsRoutine()
+        {
+            yield return null;
+
+            foreach (var obj in _itemObjectList)
+            {
+                obj.gameObject.SetActive(true);
+            }
         }
 
         public void ResetScore()
